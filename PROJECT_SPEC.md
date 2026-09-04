@@ -154,6 +154,8 @@ Current implementation:
 - deterministic static HTML generation through `scripts/render_listings.py`
 - PR checks validate local links, common secret patterns, listing schema and JSON-to-HTML synchronization
 - scheduled CI checks verified event end dates and flags stale events for review rather than deleting or rewriting content automatically
+- path-filtered rendered Browser QA uses pinned Playwright/Chromium against a local GitHub Actions runner server for UI-affecting changes; it validates desktop/mobile layout and navigation behavior without contacting production
+- Browser QA stores reviewable desktop/mobile screenshot artifacts so rendered evidence is available even when the operator has no local browser environment
 
 ## 10. Development / Deployment
 
@@ -172,6 +174,7 @@ Current implementation:
 The repository-side MVP foundation is complete when:
 - the six primary public pages exist and share navigation / design
 - mobile navigation works
+- UI-affecting changes can pass repository-native rendered desktop/mobile Browser QA with reviewable screenshot evidence
 - verified listings are sourced from canonical JSON and generated HTML stays in sync
 - expired verified events are detectable by automated checks
 - no fabricated live listing facts are presented as real
