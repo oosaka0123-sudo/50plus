@@ -32,6 +32,7 @@ jobs:
               Path('assets/styles.css'),
               Path('assets/main.js'),
               Path('data/verified-listings.json'),
+              Path('scripts/render_listings.py'),
               Path('PROJECT_SPEC.md'),
           ]
 
@@ -143,6 +144,9 @@ jobs:
 
           print(f'Validated {len(items)} verified listing records.')
           PY
+
+      - name: Verify listings HTML is generated from JSON
+        run: python3 scripts/render_listings.py --check
 
       - name: Reject common secret patterns in tracked source
         run: |
