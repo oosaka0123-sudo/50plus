@@ -48,12 +48,30 @@ Add exactly one of the supported secret names above.
 
 After authentication is configured:
 1. Open the target GitHub Issue.
-2. Confirm no other Agent is actively implementing the same Issue.
-3. The repository OWNER posts a new comment containing `@claude`.
-4. Confirm `Claude Code Issue Implementation` starts in Actions.
-5. Confirm the authentication check passes.
-6. Claude must use a dedicated branch, run checks, and create/update a PR.
-7. Do not auto-merge; review evidence first.
+2. Confirm no other Agent is actively working on the same Issue.
+3. Read the Issue task mode before triggering Claude:
+   - if it explicitly says `ANALYSIS ONLY`, no repository changes, no Branch/Commit/PR, or equivalent, treat it as analysis-only
+   - otherwise treat it as an implementation task
+4. The repository OWNER posts a new comment containing `@claude`.
+5. Confirm `Claude Code Issue Task` starts in Actions.
+6. Confirm the authentication check passes.
+7. For an analysis-only Issue, confirm Claude does **not** create or modify files, branches, commits or PRs and returns only the requested Issue analysis.
+8. For an implementation Issue, Claude must use a dedicated branch, run relevant checks, and create/update a PR.
+9. Do not auto-merge implementation PRs; review evidence first.
+
+### Task-mode safety
+
+The target Issue's explicit scope and task-mode constraints override the default implementation workflow.
+
+For `ANALYSIS ONLY` Issues:
+- repository reads are allowed
+- repository mutations are forbidden
+- no Branch / Commit / Pull Request should be created
+- the requested analysis belongs in the Issue conversation
+
+For implementation Issues:
+- use Issue → dedicated Branch → implementation → checks → PR
+- never commit directly to `main`
 
 ### Trigger safety
 
@@ -162,5 +180,7 @@ Never fabricate live venue/event facts, schedules, prices, ratings, participant 
 
 For implementation tasks prefer:
 Issue → Active Owner → Branch → Implementation → Test → PR → Review → Merge.
+
+For analysis-only tasks, follow the Issue's requested output without creating repository mutations.
 
 For long AI sessions, write a repository handoff instead of depending on conversation history.

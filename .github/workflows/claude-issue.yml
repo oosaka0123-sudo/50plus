@@ -1,4 +1,4 @@
-name: Claude Code Issue Implementation
+name: Claude Code Issue Task
 
 on:
   issue_comment:
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  claude-implement:
+  claude-task:
     if: >-
       ${{
         github.event_name == 'issue_comment' &&
@@ -51,25 +51,35 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |-
-            You are Claude Code, the Active Owner for the 50PLUS GitHub Issue that received the triggering @claude comment.
+            You are Claude Code, the Active Owner or independent reviewer for the 50PLUS GitHub Issue that received the triggering @claude comment.
 
-            Before making changes:
+            Before doing any task work:
             1. Read the target Issue body and all current comments.
             2. Read AGENTS.md, CLAUDE.md, PROJECT_SPEC.md and README.md.
             3. Confirm the current default branch and current main state.
-            4. Check existing open PRs/branches so you do not duplicate another active implementation.
+            4. Check existing open PRs/branches so you do not duplicate another active task.
 
-            Governance:
+            Task-mode precedence — MUST follow before the default workflow below:
+            - The target Issue's explicit scope, output format, and task-mode constraints are authoritative for that Issue.
+            - If the Issue explicitly says ANALYSIS ONLY, no repository changes, no Branch/Commit/PR, or equivalent, use ANALYSIS-ONLY MODE.
+            - In ANALYSIS-ONLY MODE: do not create, modify, move or delete repository files; do not create or modify branches, commits or pull requests; do not run mutating git/GitHub commands. Read current evidence, perform the requested analysis, return the requested response in the Issue conversation, and stop. The implementation workflow below does not apply.
+            - Otherwise use IMPLEMENTATION MODE.
+
+            Common governance for every mode:
             - GitHub is the SSOT; current repository state overrides chat/model memory.
-            - Use one dedicated branch for this Issue. Never commit directly to main.
-            - Keep changes reviewable and within the Issue scope.
-            - Run relevant tests/static checks before opening or updating a PR.
-            - Open a PR and include concrete test/review evidence.
+            - Stay within the target Issue scope.
             - If blocked, report OBSERVED / EVIDENCE / NEXT on the Issue instead of inventing success.
             - Do not deploy to Lolipop and do not change GitHub Secrets, credentials, IAM, billing, repository visibility, or other irreversible settings.
             - Do not fabricate real venues, events, schedules, participant demographics, gender ratios, ages, ratings, prices, attendance, or reviews.
             - Preserve the 50PLUS adult friendship/community product boundary and accessibility rules.
-            - Follow the repository handoff/context rules for long sessions.
+            - Follow repository handoff/context rules for long sessions.
 
-            Complete as much of the Issue as safely possible, then leave the repository in a PR-reviewable state.
+            IMPLEMENTATION MODE only:
+            - Use one dedicated branch for this Issue. Never commit directly to main.
+            - Keep changes reviewable and within the Issue scope.
+            - Run relevant tests/static checks before opening or updating a PR.
+            - Open a PR and include concrete test/review evidence.
+            - Do not auto-merge; leave the implementation in a PR-reviewable state.
+
+            Complete as much of the Issue as its selected task mode safely allows.
           claude_args: '--max-turns 20 --allowed-tools "Bash"'
