@@ -18,6 +18,8 @@
 - Final hosting: Lolipop
 - Migration to Lolipop happens **after the site is considered complete and the user explicitly moves to final production**.
 
+GitHub Pages is therefore a temporary public development/preview environment, not a replacement for the final Lolipop production target.
+
 ## Repository
 
 - `oosaka0123-sudo/50plus`
