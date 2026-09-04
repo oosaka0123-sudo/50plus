@@ -84,6 +84,52 @@ The workflow is intentionally bounded:
 - no automatic merge is included
 - secret mutation is outside Claude's task scope
 
+## Rendered browser QA
+
+### Workflow
+
+`.github/workflows/browser-qa.yml`
+
+Purpose:
+- provide repeatable rendered desktop/mobile evidence without requiring a local browser
+- test checked-out repository files through a local HTTP server on the GitHub Actions runner
+- never use the production URL, deployment credentials or deployment workflow
+
+The workflow runs automatically for UI-affecting pull requests and can also be started with `workflow_dispatch`.
+
+Current rendered coverage:
+- HOME
+- Activities
+- Listings
+- Guides
+- About
+- Contact
+- 404
+
+Viewports:
+- desktop: `1440x900`
+- mobile: `390x844`
+
+Checks include:
+- successful local page response
+- visible primary H1
+- no horizontal page overflow
+- desktop navigation visible and non-inert
+- mobile menu closed/inert state, open state, keyboard Tab entry, Escape close and focus restoration
+- reveal elements reaching their settled visible state before screenshots are captured
+
+### Screenshot evidence
+
+Each successful or failed run attempts to upload the `browser-qa-screenshots` artifact with full-page PNGs for all page/viewport combinations. The current workflow retains the artifact for 14 days.
+
+For UI-affecting PRs:
+1. Wait for both `PR checks` and `Browser QA`.
+2. Require both to pass before merge.
+3. Review the screenshot artifact when the change can affect layout, navigation, typography, spacing or interaction.
+4. If Browser QA fails, inspect both the error output and screenshots; do not treat a generated artifact by itself as proof of success.
+
+Before first deployment, manually run `Browser QA` on the intended current `main` release and review its artifact in addition to the normal deployment preflight.
+
 ## Lolipop deployment
 
 ### Workflow
@@ -128,7 +174,7 @@ Then add the four repository secrets.
 ### First deployment sequence
 
 1. Confirm `main` contains the intended release.
-2. Confirm PR checks are green.
+2. Confirm PR checks and Browser QA are green for the intended release.
 3. Confirm no secret values are present in tracked files.
 4. Open GitHub Actions → `Deploy to Lolipop (manual only)`.
 5. Run the workflow manually.
