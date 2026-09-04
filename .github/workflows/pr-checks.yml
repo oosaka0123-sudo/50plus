@@ -3,6 +3,8 @@ name: PR checks
 on:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: '0 21 * * *'
 
 permissions:
   contents: read
@@ -94,6 +96,7 @@ jobs:
           path = Path('data/verified-listings.json')
           data = json.loads(path.read_text(encoding='utf-8'))
           errors = []
+          today = date.today()
 
           if data.get('schema_version') != 1:
               errors.append('schema_version must be 1')
@@ -130,19 +133,49 @@ jobs:
               verified_at = item.get('verified_at')
               try:
                   verified_date = date.fromisoformat(verified_at)
-                  if verified_date > date.today():
+                  if verified_date > today:
                       errors.append(f'{prefix}: verified_at cannot be in the future')
               except (TypeError, ValueError):
                   errors.append(f'{prefix}: verified_at must be YYYY-MM-DD')
 
-              if item.get('kind') == 'event' and not item.get('schedule'):
-                  errors.append(f'{prefix}: event must include schedule')
+              if item.get('kind') == 'event':
+                  if not item.get('schedule'):
+                      errors.append(f'{prefix}: event must include schedule')
+
+                  start_raw = item.get('start_date')
+                  end_raw = item.get('end_date')
+                  if not start_raw:
+                      errors.append(f'{prefix}: event must include start_date')
+                  if not end_raw:
+                      errors.append(f'{prefix}: event must include end_date')
+
+                  start_date = None
+                  end_date = None
+                  if start_raw:
+                      try:
+                          start_date = date.fromisoformat(start_raw)
+                      except (TypeError, ValueError):
+                          errors.append(f'{prefix}: start_date must be YYYY-MM-DD')
+                  if end_raw:
+                      try:
+                          end_date = date.fromisoformat(end_raw)
+                      except (TypeError, ValueError):
+                          errors.append(f'{prefix}: end_date must be YYYY-MM-DD')
+
+                  if start_date and end_date:
+                      if start_date > end_date:
+                          errors.append(f'{prefix}: start_date cannot be after end_date')
+                      if end_date < today:
+                          errors.append(
+                              f'{prefix}: verified event ended on {end_date.isoformat()}; '
+                              'review, remove, or reclassify it before publishing'
+                          )
 
           if errors:
               print('\n'.join(errors))
               sys.exit(1)
 
-          print(f'Validated {len(items)} verified listing records.')
+          print(f'Validated {len(items)} verified listing records; no verified event is expired.')
           PY
 
       - name: Verify listings HTML is generated from JSON
