@@ -25,11 +25,13 @@ jobs:
           required = [
               Path('index.html'),
               Path('activities.html'),
+              Path('listings.html'),
               Path('guides.html'),
               Path('about.html'),
               Path('contact.html'),
               Path('assets/styles.css'),
               Path('assets/main.js'),
+              Path('data/verified-listings.json'),
               Path('PROJECT_SPEC.md'),
           ]
 
@@ -77,6 +79,69 @@ jobs:
               sys.exit(1)
 
           print(f'Checked {len(html_files)} HTML files; required files and local links are valid.')
+          PY
+
+      - name: Validate verified listings JSON
+        run: |
+          python3 - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import sys
+
+          path = Path('data/verified-listings.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          errors = []
+
+          if data.get('schema_version') != 1:
+              errors.append('schema_version must be 1')
+
+          items = data.get('items')
+          if not isinstance(items, list) or not items:
+              errors.append('items must be a non-empty list')
+              items = []
+
+          seen_ids = set()
+          for index, item in enumerate(items, start=1):
+              prefix = f'item {index}'
+              for key in ('id', 'kind', 'name', 'category', 'area', 'summary', 'source_urls', 'verified_at'):
+                  if not item.get(key):
+                      errors.append(f'{prefix}: missing {key}')
+
+              item_id = item.get('id')
+              if item_id in seen_ids:
+                  errors.append(f'{prefix}: duplicate id {item_id}')
+              seen_ids.add(item_id)
+
+              if item.get('kind') not in {'resource', 'event'}:
+                  errors.append(f'{prefix}: kind must be resource or event')
+
+              urls = item.get('source_urls', [])
+              if not isinstance(urls, list) or not urls:
+                  errors.append(f'{prefix}: source_urls must be a non-empty list')
+              else:
+                  for url in urls:
+                      parsed = urlsplit(url)
+                      if parsed.scheme != 'https' or not parsed.netloc:
+                          errors.append(f'{prefix}: source URL must be https: {url}')
+
+              verified_at = item.get('verified_at')
+              try:
+                  verified_date = date.fromisoformat(verified_at)
+                  if verified_date > date.today():
+                      errors.append(f'{prefix}: verified_at cannot be in the future')
+              except (TypeError, ValueError):
+                  errors.append(f'{prefix}: verified_at must be YYYY-MM-DD')
+
+              if item.get('kind') == 'event' and not item.get('schedule'):
+                  errors.append(f'{prefix}: event must include schedule')
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+
+          print(f'Validated {len(items)} verified listing records.')
           PY
 
       - name: Reject common secret patterns in tracked source
