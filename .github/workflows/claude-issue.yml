@@ -1,0 +1,75 @@
+name: Claude Code Issue Implementation
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: claude-50plus-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude-implement:
+    if: >-
+      ${{
+        github.event_name == 'issue_comment' &&
+        github.event.action == 'created' &&
+        github.event.comment.author_association == 'OWNER' &&
+        github.event.comment.user.type != 'Bot' &&
+        contains(github.event.comment.body, '@claude')
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Anthropic authentication availability
+        env:
+          HAS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          HAS_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+        run: |
+          if [ "$HAS_API_KEY" != "true" ] && [ "$HAS_OAUTH_TOKEN" != "true" ]; then
+            echo "::error::Claude authentication is not configured for this repository. Configure either ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN as a GitHub Actions secret before triggering @claude."
+            exit 1
+          fi
+          echo "A supported Claude authentication method is configured. Secret values are not printed."
+
+      - name: Run Claude Code Action
+        uses: anthropics/claude-code-action@ef8bb1e43bf303cff727a1dd0b8837029fe982a2
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |-
+            You are Claude Code, the Active Owner for the 50PLUS GitHub Issue that received the triggering @claude comment.
+
+            Before making changes:
+            1. Read the target Issue body and all current comments.
+            2. Read AGENTS.md, CLAUDE.md, PROJECT_SPEC.md and README.md.
+            3. Confirm the current default branch and current main state.
+            4. Check existing open PRs/branches so you do not duplicate another active implementation.
+
+            Governance:
+            - GitHub is the SSOT; current repository state overrides chat/model memory.
+            - Use one dedicated branch for this Issue. Never commit directly to main.
+            - Keep changes reviewable and within the Issue scope.
+            - Run relevant tests/static checks before opening or updating a PR.
+            - Open a PR and include concrete test/review evidence.
+            - If blocked, report OBSERVED / EVIDENCE / NEXT on the Issue instead of inventing success.
+            - Do not deploy to Lolipop and do not change GitHub Secrets, credentials, IAM, billing, repository visibility, or other irreversible settings.
+            - Do not fabricate real venues, events, schedules, participant demographics, gender ratios, ages, ratings, prices, attendance, or reviews.
+            - Preserve the 50PLUS adult friendship/community product boundary and accessibility rules.
+            - Follow the repository handoff/context rules for long sessions.
+
+            Complete as much of the Issue as safely possible, then leave the repository in a PR-reviewable state.
+          claude_args: '--max-turns 20 --allowed-tools "Bash"'
