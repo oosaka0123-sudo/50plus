@@ -1,9 +1,11 @@
-name: Deploy preview to GitHub Pages
+name: Deploy dedicated 50PLUS GitHub Pages (manual only)
+
+# The active development preview is currently published through the already-enabled
+# oosaka0123-sudo/ai-agent Pages site at /ai-agent/50plus/.
+# Keep this workflow for a future dedicated 50PLUS Pages site, but do not create a
+# known-failing run on every main update while repository Pages remains disabled.
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
