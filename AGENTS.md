@@ -36,11 +36,13 @@ Age-related editorial content is allowed when it is respectful, adult-only and r
 
 ### Current preview stage
 
-Current preview URL: `https://oosaka0123-sudo.github.io/50plus/`
+Active preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
 
-During active development, GitHub Pages is the public preview environment. The Pages workflow publishes a reduced static artifact from current `main` and injects `noindex,nofollow` into preview HTML so the temporary preview is not treated as the final SEO destination.
+During active development, the already-enabled GitHub Pages site in `oosaka0123-sudo/ai-agent` acts as a temporary preview bridge. Its Pages build reads the current public `oosaka0123-sudo/50plus` `main`, generates only runtime preview files under `web/50plus/`, injects `noindex,nofollow`, and deploys them without committing copied 50PLUS files into `ai-agent`.
 
-Agents may update the GitHub Pages preview through the normal Issue/Branch/PR/Merge flow when repository rules and CI allow it.
+This repository remains the sole project/code/content SSOT. The bridge is a publishing mechanism only.
+
+The repository-local dedicated Pages workflow is manual-only while 50PLUS Pages itself remains disabled. Do not treat that disabled dedicated Pages setting as a development blocker while the bridge is healthy.
 
 ### Final production stage
 

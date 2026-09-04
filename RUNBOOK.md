@@ -8,11 +8,15 @@ This file is the operational handoff for one-time setup and repeatable remote op
 
 ### Current development preview
 
-- Repository: `oosaka0123-sudo/50plus`
-- Preview URL: `https://oosaka0123-sudo.github.io/50plus/`
-- Default branch: confirm current GitHub state before work
-- Preview deployment: GitHub Pages via GitHub Actions
-- Search policy: preview HTML is deployed with `noindex,nofollow`
+- Source repository / SSOT: `oosaka0123-sudo/50plus`
+- Active preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+- Preview host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
+- Preview source: current public `oosaka0123-sudo/50plus` `main`
+- Search policy: generated preview HTML is deployed with `noindex,nofollow`
+
+The ai-agent Pages workflow is a **temporary publishing bridge only**. It reads 50PLUS `main` during the Actions run, generates the runtime preview under the Pages artifact, and does not commit copied 50PLUS website files into ai-agent.
+
+The repository-local `.github/workflows/deploy-pages.yml` is manual-only while dedicated Pages for `oosaka0123-sudo/50plus` remains disabled. Do not trigger it during normal development merely to refresh the active preview.
 
 ### Final production target
 
@@ -22,31 +26,17 @@ This file is the operational handoff for one-time setup and repeatable remote op
 
 Lolipop configuration is **not** a blocker for current development. Do not trigger the Lolipop workflow or request Lolipop secrets during the GitHub Pages development stage.
 
-## GitHub Pages preview deployment
+## Active GitHub Pages preview bridge
 
-### Workflow
+### Source of truth
 
-`.github/workflows/deploy-pages.yml`
+All product code, HTML, CSS, JavaScript, listing data and project rules remain in `oosaka0123-sudo/50plus`.
 
-Purpose:
-- publish current `main` for visual and functional review during development
-- require no FTP/FTPS credentials
-- publish only runtime static site files, not repository docs/scripts/data
-- inject `noindex,nofollow` into the deployed preview HTML without modifying source HTML
+The bridge lives in the existing `oosaka0123-sudo/ai-agent` Pages workflow and performs a read-only clone of current public `50plus/main` during deployment. The generated preview copy is ephemeral and exists only in the Pages build workspace/artifact.
 
-Expected flow:
-1. Work through Issue → Branch → implementation → checks → PR.
-2. Require applicable `PR checks` and `Browser QA` before merge.
-3. Merge to `main`.
-4. `Deploy preview to GitHub Pages` runs from `main`.
-5. Confirm the Pages deployment succeeds.
-6. Verify `https://oosaka0123-sudo.github.io/50plus/` in a browser.
+### Published runtime files
 
-The GitHub Pages repository setting must use **Settings → Pages → Build and deployment → Source: GitHub Actions**. If that one-time setting is not enabled, record it as the publication blocker instead of claiming the site is live.
-
-### Preview artifact
-
-The Pages workflow publishes:
+The bridge publishes under `/ai-agent/50plus/`:
 - `index.html`
 - `activities.html`
 - `listings.html`
@@ -55,15 +45,39 @@ The Pages workflow publishes:
 - `contact.html`
 - `404.html`
 - `assets/`
-- `.nojekyll`
 
-Repository-only docs, workflows, canonical JSON and scripts are intentionally not part of the public preview artifact.
+It verifies that all seven HTML files exist and that `assets/styles.css` and `assets/main.js` exist before deployment.
 
-The deploy job injects this into each preview HTML page:
+### Search protection
+
+The bridge injects this into every generated preview HTML page:
 
 `<meta name="robots" content="noindex,nofollow">`
 
-Do not add this staging-only tag permanently to source HTML unless the publication policy changes.
+The injection is verified during the Actions run. Do not add this staging-only tag permanently to the 50PLUS source HTML; source canonical/OG metadata remains prepared for the final Lolipop domain.
+
+### Refresh behavior
+
+The bridge is scheduled from `ai-agent` and refreshes periodically by reading the latest 50PLUS `main`. A normal 50PLUS merge therefore does not need direct Pages enablement in this repository.
+
+If an immediate preview refresh is needed, use the current ai-agent Pages workflow according to that repository's rules rather than changing the 50PLUS source-of-truth boundary.
+
+### Verification rule
+
+Do not claim a newly changed preview is refreshed merely because 50PLUS was merged. Check the relevant ai-agent Pages run and require:
+1. current 50PLUS `main` clone succeeds
+2. seven HTML pages/assets validation succeeds
+3. `noindex,nofollow` verification succeeds
+4. Pages artifact upload succeeds
+5. `deploy-pages` succeeds
+
+The bridge mechanism has been successfully executed from both its review branch and ai-agent `main`. Browser-level live rendering should still be distinguished from Actions deployment evidence when no browser observation is available.
+
+## Dedicated 50PLUS Pages workflow — dormant/manual
+
+`.github/workflows/deploy-pages.yml` is retained as a possible future dedicated Pages path but is **manual-only** while repository Pages remains disabled.
+
+Do not re-enable automatic `main` push deployment here unless dedicated 50PLUS Pages is actually enabled and a successful deployment is verified. The active development preview does not depend on this workflow.
 
 ## Claude Code Issue automation
 
@@ -181,7 +195,7 @@ Before final Lolipop deployment:
 6. Run the Lolipop preflight and require success.
 7. Run the manual Lolipop deploy.
 8. Verify `https://50plus.rss7.net/`, all primary pages, `robots.txt`, `sitemap.xml` and 404 behavior.
-9. Confirm final SEO behavior and retire GitHub Pages as the active public preview if appropriate.
+9. Confirm final SEO behavior and retire the temporary ai-agent Pages bridge unless explicitly retained.
 
 Do not mark final production complete until live verification succeeds.
 
