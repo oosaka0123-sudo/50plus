@@ -116,8 +116,41 @@ Then add the four repository secrets.
 5. Run the workflow manually.
 6. Inspect the workflow result.
 7. Verify `https://50plus.rss7.net/` in a browser.
-8. Verify at least HOME, Activities, Guides, About, Contact, `robots.txt`, `sitemap.xml`, and a nonexistent URL for 404 behavior.
+8. Verify at least HOME, Activities, Listings, Guides, About, Contact, `robots.txt`, `sitemap.xml`, and a nonexistent URL for 404 behavior.
 9. Record the deployment evidence in the relevant Issue/PR.
+
+## Verified listings maintenance
+
+### Source of truth
+
+`data/verified-listings.json` is the canonical source for factual listing data.
+
+Do not hand-edit the generated verified-listing cards in `listings.html`. The generated block is bounded by:
+- `VERIFIED_LISTINGS_GENERATED_START`
+- `VERIFIED_LISTINGS_GENERATED_END`
+
+### Update sequence
+
+1. Re-check the official source before changing a listing.
+2. Update only verified facts in `data/verified-listings.json`.
+3. Update `verified_at` for the record when it is actually re-verified.
+4. For `kind: event`, maintain machine-readable `start_date` and `end_date` in `YYYY-MM-DD` format in addition to the human-readable `schedule`.
+5. Run:
+   `python3 scripts/render_listings.py`
+6. Review the generated `listings.html` diff.
+7. Run or wait for PR checks.
+8. Merge only after JSON validation, HTML sync, local-link and secret-pattern checks pass.
+
+### Automatic stale-event guard
+
+The PR/static-check workflow also runs daily at `21:00 UTC` (06:00 JST).
+
+For verified events:
+- missing or malformed `start_date` / `end_date` fails validation
+- `start_date` after `end_date` fails validation
+- an `end_date` earlier than the current date fails validation
+
+A scheduled failure does not automatically delete or rewrite an event. It is a review signal: verify the official source, then remove, replace, archive or otherwise reclassify the record deliberately.
 
 ## Project boundary
 
