@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "managed_by": "oosaka0123-sudo/ai-agent",
+  "project": {
+    "slug": "50plus",
+    "name": "50PLUS",
+    "repository": "oosaka0123-sudo/50plus",
+    "public_url": "https://oosaka0123-sudo.github.io/50plus/",
+    "role": "web-pwa-production"
+  },
+  "automation": {
+    "media": {
+      "enabled": true,
+      "provider": "auto",
+      "control_plane_project": "rss7-ai-media",
+      "fallback_provider": "higgsfield"
+    },
+    "publish_policy": "preview-first",
+    "direct_main_push": false
+  }
+}
