@@ -35,7 +35,7 @@ Secondary:
 - Adults under or over 50 who are comfortable joining mixed-age adult communities
 - Organizers of safe, legitimate adult community activities
 
-## 5. MVP Information Architecture
+## 5. Current Information Architecture
 
 ### Home — `index.html`
 - Brand / hero
@@ -43,13 +43,20 @@ Secondary:
 - Activity categories
 - First-step guide
 - Safety / editorial promise
-- Links to other pages
+- Direct route to verified Osaka listings
 
 ### Activities — `activities.html`
 - Ways to meet people through activities
 - Categories: walking, learning, sports, culture, volunteering, food / social, outdoor
-- Evaluation framework for future verified listings
-- No fabricated live event data in MVP
+- Evaluation framework for choosing activities
+- Route to verified Osaka listings
+
+### Listings — `listings.html`
+- Official-source-backed Osaka activity and event information
+- Source links and verification date
+- Published participation requirements, price and schedule only when verified
+- Clear separation between sourced facts and unsupported assumptions
+- Generated listing cards must remain synchronized with canonical JSON data
 
 ### Guides — `guides.html`
 - How to join alone
@@ -68,18 +75,25 @@ Secondary:
 - Future contact / listing request policy
 - No fake contact destination before a real channel is configured
 
-## 6. Future Verified Listing Fields
+## 6. Verified Listing Data Model
 
-When real activities or venues are added, each listing may include only verified / sourced facts such as:
+`data/verified-listings.json` is the canonical factual source for verified listings.
+
+Each listing may include only verified / sourced facts such as:
+- Stable ID
+- Kind / category
 - Name
-- Category
 - Area / access
-- Official URL
+- Official source URL or URLs
 - Published participation requirements
 - Published price
 - Official schedule or link
 - Whether solo participation is explicitly welcomed
 - Source / last verification date
+
+For event records, machine-readable `start_date` and `end_date` are maintained in addition to human-readable schedule text so stale events can be detected automatically.
+
+`listings.html` contains committed static markup for SEO and no-JavaScript readability, but its verified-listing block is deterministically generated from the canonical JSON by `scripts/render_listings.py`. Hand-edited factual drift between JSON and rendered HTML is not allowed.
 
 Editorial observations such as atmosphere or beginner friendliness must be clearly labeled as editorial judgment and should not be presented as objective fact without evidence.
 
@@ -127,15 +141,19 @@ Avoid:
 - excessive pink / romance cues
 - medical / retirement-home tone
 
-## 9. Technical MVP
+## 9. Technical Architecture
 
-Initial implementation:
+Current implementation:
 - static HTML / CSS / vanilla JavaScript
 - responsive mobile-first layout
 - semantic HTML
 - accessible navigation and focus states
 - no external runtime dependency required for core UI
-- SEO title / description / canonical placeholders for planned domain
+- SEO title / description / canonical metadata for the planned domain
+- canonical verified-listing data in `data/verified-listings.json`
+- deterministic static HTML generation through `scripts/render_listings.py`
+- PR checks validate local links, common secret patterns, listing schema and JSON-to-HTML synchronization
+- scheduled CI checks verified event end dates and flags stale events for review rather than deleting or rewriting content automatically
 
 ## 10. Development / Deployment
 
@@ -147,13 +165,18 @@ Initial implementation:
 - Initial workflow must remain `workflow_dispatch` only until Lolipop directory and GitHub Secrets are verified.
 - Initial deployment must not use `mirror --delete`.
 - Never commit secrets.
+- Detailed operational setup and maintenance procedures belong in `RUNBOOK.md`.
 
-## 11. Initial Completion Definition
+## 11. Current Completion Definition
 
-The MVP foundation is complete when:
-- the five core pages exist and share navigation / design
+The repository-side MVP foundation is complete when:
+- the six primary public pages exist and share navigation / design
 - mobile navigation works
-- no fabricated live listings are presented as real
-- static files are reviewable via PR
+- verified listings are sourced from canonical JSON and generated HTML stays in sync
+- expired verified events are detectable by automated checks
+- no fabricated live listing facts are presented as real
+- static files and factual data changes are reviewable via PR
 - manual-only FTPS workflow exists without destructive delete sync
 - automatic deployment remains disabled until server settings are verified
+
+Human-only launch blockers such as Claude authentication and Lolipop deployment secrets are tracked separately and must not be guessed or bypassed by Agents.
