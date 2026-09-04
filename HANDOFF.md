@@ -29,75 +29,94 @@ The repository-side MVP foundation is in place:
 - responsive static HTML / CSS / vanilla JavaScript
 - adult friendship / community discovery positioning; not a dating, pickup or sexual-service product
 - verified listing facts use `data/verified-listings.json` as canonical data
-- `scripts/render_listings.py` deterministically keeps the generated listing block in `listings.html` synchronized with canonical JSON
+- `scripts/render_listings.py` deterministically keeps generated listing markup synchronized with canonical JSON
 - CI validates local links, common secret patterns, listing schema, JSON-to-HTML sync and stale verified event dates
 - repository-native Browser QA uses pinned Playwright / Chromium against checked-out files served locally on the GitHub Actions runner
-- Browser QA covers HOME, Activities, Listings, Guides, About, Contact and 404 at desktop and mobile viewports, including horizontal-overflow and navigation interaction checks plus screenshot artifacts
+- Browser QA covers HOME, Activities, Listings, Guides, About, Contact and 404 at desktop and mobile viewports
 - mobile navigation prevents focus entering a closed menu and restores focus to the trigger when Escape closes an open menu
-- Claude Issue automation supports two task modes: explicit ANALYSIS-ONLY MODE and normal IMPLEMENTATION MODE
-- Lolipop deployment remains manual-only and does not use destructive mirror-delete behavior
+- Claude Issue automation supports explicit ANALYSIS-ONLY MODE and normal IMPLEMENTATION MODE
 
-Detailed durable behavior belongs in `PROJECT_SPEC.md` and `RUNBOOK.md`; do not duplicate those documents here unnecessarily.
+## Publishing decision
+
+The user has set a two-stage publishing plan:
+
+### Stage A — now / during development
+
+- Public preview: `https://oosaka0123-sudo.github.io/50plus/`
+- Hosting: GitHub Pages
+- Source: current `main` via GitHub Actions
+- Purpose: continue development, mobile checking, visual QA and stakeholder/client review until the site is considered complete
+- Preview HTML is deployed with `noindex,nofollow` injected into the Pages artifact so this temporary preview is not the final SEO destination
+- Lolipop configuration is **not** a blocker during this stage
+
+### Stage B — after completion
+
+- Final production URL: `https://50plus.rss7.net`
+- Final hosting: Lolipop
+- Migration is performed only after the user explicitly considers 50PLUS complete and moves it to final production
+- Existing manual Lolipop deployment/preflight paths are retained for that future stage
+
+Do not prematurely switch the project back to Lolipop during normal development.
 
 ## Current incomplete handoff
 
-### Human configuration blocker
+### GitHub Pages preview verification
 
-The remaining configuration involving secret values is intentionally human-owned and tracked by the current human-setup Issue.
+Repository work may prepare the Pages workflow, but do not claim the preview is live until:
 
-At the last verified state:
+1. the Pages deployment workflow is merged to `main`
+2. GitHub Pages publishing source is enabled for GitHub Actions if required in repository Settings
+3. a Pages deployment run succeeds
+4. the published GitHub Pages URL is opened and verified
 
-- Claude authentication still required one supported repository secret to be configured by the human owner
-- first Lolipop deployment still required the expected Lolipop repository secrets and verified dedicated server directory
-- no secret values were exposed or stored in repository files
-- production deployment had not been performed
+If the repository setting is still disabled, report that exact one-time setting as the publication blocker.
 
-**Never invent, retrieve, copy into chat, commit, log or modify secret values.** Re-check the current human-setup Issue and `RUNBOOK.md` before any authentication or deployment step.
+### Claude authentication
+
+Claude Issue automation still requires one supported repository authentication secret configured by the human owner before Claude can run.
+
+Never invent, retrieve, copy into chat, commit, log or modify secret values.
 
 ### Claude independent review
 
 A current open meta-review Issue is intended for Claude after authentication is available.
 
 That task is explicitly **ANALYSIS ONLY**:
-
 - repository reads are allowed
 - repository file changes are forbidden
 - no Branch / Commit / Pull Request should be created
 - Claude should return only the requested analysis in the Issue conversation
 
-The Claude workflow has been updated so explicit analysis-only task directives override the default implementation flow. Always re-read the current Issue body before triggering it.
-
-## Before first production deployment
-
-Do not treat repository readiness as production launch approval.
-
-Before first deployment, verify the current `RUNBOOK.md` and require the current equivalent of all of these safeguards:
-
-1. human confirms the `50plus.rss7.net` target and dedicated Lolipop public directory
-2. required repository secrets are configured by the human owner without exposing values
-3. Lolipop deployment preflight passes
-4. current `main` passes PR/static checks as applicable
-5. Browser QA is run on the intended current `main` release and screenshot evidence is reviewed
-6. deployment remains a deliberate manual action
-7. after deployment, verify the public site and required pages / 404 behavior
-
-## Next-session decision rule
+## Current development rule
 
 After reconciliation:
 
-- if the human configuration blocker is still unresolved, do not attempt to bypass it; continue only independent safe work
-- if Claude authentication is ready, verify the analysis-only Claude task according to its current Issue instructions
-- if deployment configuration is ready, follow the current preflight and manual deploy sequence in `RUNBOOK.md`
-- if new Issues / PRs / Actions have appeared, treat them as newer evidence than this handoff
+- continue ordinary development through Issue → Branch → checks → PR → Merge
+- use GitHub Pages as the development preview
+- use Browser QA as repository-native rendered evidence
+- if Claude authentication becomes available, verify the analysis-only Claude task according to its current Issue
+- do not request Lolipop secrets or trigger Lolipop deploy merely to continue development
+
+## Future final migration rule
+
+Only when the user explicitly says the site is complete / ready for final production:
+
+1. confirm intended final `main`
+2. require current PR/static checks and Browser QA evidence
+3. human verifies the dedicated `50plus.rss7.net` Lolipop directory
+4. human configures required Lolipop repository secrets
+5. run Lolipop preflight
+6. perform deliberate manual Lolipop deployment
+7. verify final domain pages, SEO files and 404 behavior
+8. decide whether to retire or retain the GitHub Pages preview
 
 ## Do not store here
 
 Do not copy into this file:
-
 - raw chat transcripts
 - secret values or credentials
 - rolling lists of PR numbers, Merge SHAs or Actions run IDs
 - duplicated specifications already owned by `PROJECT_SPEC.md`
 - duplicated repeatable procedures already owned by `RUNBOOK.md`
 
-Keep this file focused on information that a new session could not safely infer from completed GitHub history alone, especially unresolved handoff constraints and resume order.
+Keep this file focused on unresolved cross-session constraints and resume decisions.
