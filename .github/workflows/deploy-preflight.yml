@@ -1,0 +1,68 @@
+name: Lolipop Deployment Preflight
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    if: >-
+      ${{
+        github.event_name == 'issue_comment' &&
+        github.event.action == 'created' &&
+        github.event.comment.author_association == 'OWNER' &&
+        github.event.comment.user.type != 'Bot' &&
+        contains(github.event.comment.body, '@deploy-preflight')
+      }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Lolipop deployment configuration without exposing values
+        env:
+          FTP_SERVER: ${{ secrets.LOLIPOP_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.LOLIPOP_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.LOLIPOP_FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.LOLIPOP_FTP_SERVER_DIR }}
+        run: |
+          missing=0
+
+          if [ -z "$FTP_SERVER" ]; then
+            echo "::error::Missing repository secret: LOLIPOP_FTP_SERVER"
+            missing=1
+          fi
+          if [ -z "$FTP_USERNAME" ]; then
+            echo "::error::Missing repository secret: LOLIPOP_FTP_USERNAME"
+            missing=1
+          fi
+          if [ -z "$FTP_PASSWORD" ]; then
+            echo "::error::Missing repository secret: LOLIPOP_FTP_PASSWORD"
+            missing=1
+          fi
+          if [ -z "$FTP_SERVER_DIR" ]; then
+            echo "::error::Missing repository secret: LOLIPOP_FTP_SERVER_DIR"
+            missing=1
+          fi
+
+          if [ "$missing" -ne 0 ]; then
+            echo "Lolipop preflight is blocked by missing repository configuration. No secret values were printed."
+            exit 1
+          fi
+
+          if [ "$FTP_SERVER" != "ftp.lolipop.jp" ]; then
+            echo "::error::LOLIPOP_FTP_SERVER is configured but does not match the verified Lolipop FTPS host."
+            exit 1
+          fi
+
+          case "$FTP_SERVER_DIR" in
+            /|""|.)
+              echo "::error::LOLIPOP_FTP_SERVER_DIR is configured with an unsafe root/empty target."
+              exit 1
+              ;;
+          esac
+
+          echo "Lolipop deployment configuration preflight passed."
+          echo "All four expected repository secrets are present; host and target-directory safety checks passed."
+          echo "No FTP/FTPS connection was attempted and no secret value was printed."
