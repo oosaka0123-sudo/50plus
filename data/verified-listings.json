@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-09-04",
+  "policy": "Official-source facts only. Do not infer participant demographics, gender ratio, atmosphere, popularity, ratings, or pickup likelihood.",
+  "items": [
+    {
+      "id": "ocvac",
+      "kind": "resource",
+      "name": "大阪市ボランティア・市民活動センター",
+      "category": "ボランティア・地域活動",
+      "area": "大阪市天王寺区",
+      "summary": "ボランティア・市民活動に関する相談、情報提供、団体情報検索を行う大阪市のセンター。団体検索にはエリアや活動内容の絞り込みがあり、『1日から参加可』の区分も用意されている。",
+      "address": "大阪市天王寺区東高津町12-10 大阪市立社会福祉センター内",
+      "source_urls": [
+        "https://ocvac.osaka-sishakyo.jp/volunteer/",
+        "https://ocvac.osaka-sishakyo.jp/volunteer/search/"
+      ],
+      "verified_at": "2026-09-04"
+    },
+    {
+      "id": "ih-osaka",
+      "kind": "resource",
+      "name": "公益財団法人大阪国際交流センター",
+      "category": "国際交流・学び・ボランティア",
+      "area": "大阪市",
+      "summary": "国際交流活動の情報拠点。公式サイトで『学ぶ・参加する』『ボランティア』『イベントカレンダー』などを案内している。",
+      "source_urls": [
+        "https://www.ih-osaka.or.jp/"
+      ],
+      "verified_at": "2026-09-04"
+    },
+    {
+      "id": "chinese-86992",
+      "kind": "event",
+      "name": "学んでみよう！中国語",
+      "category": "語学・学び",
+      "area": "大阪市北区・梅田",
+      "venue": "大阪市立総合生涯学習センター",
+      "address": "大阪市北区梅田1-2-2-500 大阪駅前第2ビル5階",
+      "schedule": "2026年9月30日〜12月16日（10月14日・21日を除く毎週水曜日）19:00〜21:00、全10回",
+      "eligibility": "どなたでも",
+      "capacity": "24人・先着",
+      "registration_period": "2026年7月29日〜9月29日",
+      "fee": "受講料20,000円、テキスト代2,500円別途",
+      "summary": "初級者向けの中国語講座。文法や会話を中心に学び、最終回には総合練習・自由会話が予定されている。",
+      "source_urls": [
+        "https://www.manabi.city.osaka.lg.jp/yoyaku/KozaEventDetailInfo.html?janru=18&jigyo_cd=86992&searchmode=2"
+      ],
+      "verified_at": "2026-09-04"
+    },
+    {
+      "id": "knit-cafe-87320",
+      "kind": "event",
+      "name": "ニットカフェ＠梅田",
+      "category": "手芸・ものづくり",
+      "area": "大阪市北区・梅田",
+      "venue": "大阪市立総合生涯学習センター",
+      "address": "大阪市北区梅田1-2-2-500 大阪駅前第2ビル5階",
+      "schedule": "2026年10月17日・24日、11月7日・21日、12月5日 10:00〜12:00、全5回",
+      "eligibility": "どなたでも",
+      "capacity": "15人・先着",
+      "fee": "受講料7,500円／5回（作品制作から参加は6,000円）、2,000円／1回。材料費2,950円。",
+      "summary": "初心者歓迎の編み物教室。初回は編み方練習、2回目から作品制作に取り組む案内になっている。",
+      "verification_note": "公式ページ間で申込期間の表記に差が見られるため、申込前に公式ページで最新情報を再確認してください。",
+      "source_urls": [
+        "https://www.manabi.city.osaka.lg.jp/yoyaku/KozaEventDetailInfo.html?jigyo_cd=87320",
+        "https://osakademanabu.com/umeda/"
+      ],
+      "verified_at": "2026-09-04"
+    }
+  ]
+}
