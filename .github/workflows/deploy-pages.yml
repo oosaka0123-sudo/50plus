@@ -1,0 +1,68 @@
+name: Deploy preview to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build preview artifact
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp index.html activities.html listings.html guides.html about.html contact.html 404.html _site/
+          cp -R assets _site/assets
+          touch _site/.nojekyll
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          marker = '<meta name="viewport" content="width=device-width, initial-scale=1">'
+          robots = '<meta name="robots" content="noindex,nofollow">'
+
+          for path in sorted(Path('_site').glob('*.html')):
+              text = path.read_text(encoding='utf-8')
+              if robots not in text:
+                  if marker not in text:
+                      raise SystemExit(f'missing viewport marker in {path}')
+                  text = text.replace(marker, marker + '\n  ' + robots, 1)
+                  path.write_text(text, encoding='utf-8')
+
+          print('Prepared GitHub Pages preview with noindex,nofollow on all HTML pages.')
+          PY
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
