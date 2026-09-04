@@ -47,6 +47,7 @@ AI agents should read:
 1. current `oosaka0123-sudo/ai-master`
 2. this repository's `AGENTS.md`
 3. this `README.md`
-4. current Issues / PRs / Actions / code
+4. `HANDOFF.md` when it exists
+5. current Issues / PRs / Actions / code
 
 Claude Code additionally uses `CLAUDE.md` as its project bootstrap.
