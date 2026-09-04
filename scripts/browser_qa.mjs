@@ -26,21 +26,26 @@ const record = (condition, message) => {
   if (!condition) errors.push(message);
 };
 
-const triggerRevealAnimations = async (page) => {
-  await page.evaluate(async () => {
-    const step = Math.max(240, Math.floor(window.innerHeight * 0.65));
-    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+const settleRevealAnimations = async (page) => {
+  const revealItems = page.locator('.reveal');
+  const count = await revealItems.count();
 
-    for (let y = 0; y <= maxScroll; y += step) {
-      window.scrollTo(0, y);
-      await new Promise((resolve) => setTimeout(resolve, 35));
-    }
+  for (let index = 0; index < count; index += 1) {
+    await revealItems.nth(index).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(45);
+  }
 
-    window.scrollTo(0, maxScroll);
-    await new Promise((resolve) => setTimeout(resolve, 80));
-    window.scrollTo(0, 0);
-    await new Promise((resolve) => setTimeout(resolve, 80));
-  });
+  await page.waitForFunction(
+    () => Array.from(document.querySelectorAll('.reveal')).every((node) => node.classList.contains('is-visible')),
+    undefined,
+    { timeout: 5_000 },
+  );
+
+  // The CSS reveal transition is 0.6s. Wait for its final visual state
+  // so screenshots represent the settled page rather than an animation frame.
+  await page.waitForTimeout(700);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(80);
 };
 
 await mkdir(screenshotDir, { recursive: true });
@@ -123,7 +128,7 @@ try {
             }
           }
 
-          await triggerRevealAnimations(page);
+          await settleRevealAnimations(page);
         } catch (error) {
           errors.push(`${prefix}: ${error instanceof Error ? error.message : String(error)}`);
         } finally {
@@ -155,4 +160,4 @@ if (errors.length) {
 }
 
 console.log(`Browser QA passed for ${pages.length} pages across ${viewports.length} viewports.`);
-console.log(`Saved ${pages.length * viewports.length} screenshots to ${screenshotDir}.`);
+console.log(`Saved ${pages.length * viewports.length} settled screenshots to ${screenshotDir}.`);
