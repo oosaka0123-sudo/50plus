@@ -2,71 +2,84 @@ name: Claude Code Issue Task
 
 on:
   issue_comment:
-    types: [created]
+    types:
+      - created
 
 permissions:
   contents: write
-  pull-requests: write
   issues: write
+  pull-requests: write
   id-token: write
 
+concurrency:
+  group: claude-50plus-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
 jobs:
-  claude:
+  claude-task:
     if: >-
-      github.event.issue.pull_request == null &&
-      contains(github.event.comment.body, '@claude') &&
-      github.event.comment.author_association == 'OWNER' &&
-      github.event.comment.user.type != 'Bot'
+      ${{
+        github.event_name == 'issue_comment' &&
+        github.event.action == 'created' &&
+        github.event.comment.author_association == 'OWNER' &&
+        github.event.comment.user.type != 'Bot' &&
+        contains(github.event.comment.body, '@claude')
+      }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check Claude authentication
-        id: auth
+      - name: Check Anthropic authentication availability
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          HAS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          HAS_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
         run: |
-          if [ -n "$ANTHROPIC_API_KEY" ]; then
-            echo "mode=api_key" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [ "$HAS_API_KEY" != "true" ] && [ "$HAS_OAUTH_TOKEN" != "true" ]; then
+            echo "::error::Claude authentication is not configured for this repository. Configure either ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN as a GitHub Actions secret before triggering @claude."
+            exit 1
           fi
-          if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
-            echo "mode=oauth_token" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          echo "::error::Claude authentication is not configured. Add ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in repository Actions secrets."
-          exit 1
+          echo "A supported Claude authentication method is configured. Secret values are not printed."
 
-      - name: Run Claude Code
-        uses: anthropics/claude-code-action@v1
+      - name: Run Claude Code Action
+        uses: anthropics/claude-code-action@ef8bb1e43bf303cff727a1dd0b8837029fe982a2
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            You are working on GitHub Issue #${{ github.event.issue.number }} in repository ${{ github.repository }}.
+          prompt: |-
+            You are Claude Code, the Active Owner or independent reviewer for the 50PLUS GitHub Issue that received the triggering @claude comment.
 
-            Read the current repository files and Issue body before acting. GitHub is the SSOT.
+            Before doing any task work:
+            1. Read the target Issue body and all current comments.
+            2. Read AGENTS.md, CLAUDE.md, PROJECT_SPEC.md and README.md.
+            3. Confirm the current default branch and current main state.
+            4. Check existing open PRs/branches so you do not duplicate another active task.
 
-            GLOBAL TASK MODE RULE:
-            - If the Issue explicitly says `ANALYSIS ONLY`, `no repository changes`, `do not create a Branch/Commit/Pull Request`, or equivalent, that instruction takes precedence over the implementation defaults below.
-            - In ANALYSIS-ONLY MODE: read repository evidence as needed, do not create or modify files, branches, commits, or pull requests, and return the requested analysis only in the Issue conversation.
+            Task-mode precedence — MUST follow before the default workflow below:
+            - The target Issue's explicit scope, output format, and task-mode constraints are authoritative for that Issue.
+            - If the Issue explicitly says ANALYSIS ONLY, no repository changes, no Branch/Commit/PR, or equivalent, use ANALYSIS-ONLY MODE.
+            - In ANALYSIS-ONLY MODE: do not create, modify, move or delete repository files; do not create or modify branches, commits or pull requests; do not run mutating git/GitHub commands. Read current evidence, perform the requested analysis, return the requested response in the Issue conversation, and stop. The implementation workflow below does not apply.
             - Otherwise use IMPLEMENTATION MODE.
 
-            COMMON SAFETY RULES:
+            Common governance for every mode:
+            - GitHub is the SSOT; current repository state overrides chat/model memory.
             - Stay within the target Issue scope.
             - If blocked, report OBSERVED / EVIDENCE / NEXT on the Issue instead of inventing success.
-            - Do not trigger final Lolipop migration and do not change GitHub Secrets, credentials, IAM, billing, repository visibility, or other irreversible settings.
-            - During active development, GitHub Pages is the public preview environment; final Lolipop production migration happens only after explicit user direction that the site is complete.
+            - Do not deploy to Lolipop and do not change GitHub Secrets, credentials, IAM, billing, repository visibility, or other irreversible settings.
             - Do not fabricate real venues, events, schedules, participant demographics, gender ratios, ages, ratings, prices, attendance, or reviews.
             - Preserve the 50PLUS adult friendship/community product boundary and accessibility rules.
             - Follow repository handoff/context rules for long sessions.
 
             IMPLEMENTATION MODE only:
             - Use one dedicated branch for this Issue. Never commit directly to main.
-            - Run relevant checks.
-            - Open or update a Pull Request with a clear summary and evidence.
-            - Do not auto-merge.
+            - Keep changes reviewable and within the Issue scope.
+            - Run relevant tests/static checks before opening or updating a PR.
+            - Open a PR and include concrete test/review evidence.
+            - Do not auto-merge; leave the implementation in a PR-reviewable state.
+
+            Complete as much of the Issue as its selected task mode safely allows.
+          claude_args: '--max-turns 20 --allowed-tools "Bash"'
