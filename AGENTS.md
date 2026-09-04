@@ -6,7 +6,7 @@ This repository is the project SSOT for 50PLUS. Global governance is defined by 
 
 1. Read current `oosaka0123-sudo/ai-master` default branch: `README.md`, `AGENTS.md`, then `PROJECTS.md`.
 2. Confirm this repository's current default branch.
-3. Read this `AGENTS.md` and `README.md`.
+3. Read this `AGENTS.md`, `README.md`, `PROJECT_SPEC.md`, `RUNBOOK.md` and `HANDOFF.md` when present.
 4. Check open Issues, open PRs, latest Actions and current code before implementation.
 5. Treat GitHub current state as authoritative over chat history or model memory.
 
@@ -32,14 +32,30 @@ Age-related editorial content is allowed when it is respectful, adult-only and r
 - Do not invent deployment state, URLs, credentials, test results or external service connections.
 - Code generation alone is not completion. Report evidence for relevant test / PR / CI / deploy / live verification steps.
 
-## Deployment
+## Publishing / Deployment
 
-Target public URL: `https://50plus.rss7.net`
+### Current preview stage
 
-The intended deployment pattern is based on the proven `oosaka0123-sudo/claudecode-kyoshitsu` GitHub Actions -> FTPS -> Lolipop workflow, but deployment configuration must be verified for this project before enabling it.
+Current preview URL: `https://oosaka0123-sudo.github.io/50plus/`
 
-Do not copy destructive synchronization options blindly. Verify the dedicated server directory and deployment exclusions before enabling any mirror/delete behavior.
+During active development, GitHub Pages is the public preview environment. The Pages workflow publishes a reduced static artifact from current `main` and injects `noindex,nofollow` into preview HTML so the temporary preview is not treated as the final SEO destination.
+
+Agents may update the GitHub Pages preview through the normal Issue/Branch/PR/Merge flow when repository rules and CI allow it.
+
+### Final production stage
+
+Planned final production URL: `https://50plus.rss7.net`
+
+Final production hosting is Lolipop, but migration is deferred until the site is considered complete and the user explicitly moves the project to final production.
+
+Until that final-migration decision:
+- do not treat Lolipop configuration as a blocker for normal development
+- do not trigger the Lolipop deploy workflow
+- do not request or modify Lolipop secret values
+- preserve the existing manual-only Lolipop path for future final migration
+
+At final migration, verify the dedicated server directory, deployment exclusions, required secrets, Browser QA evidence and live site before declaring production complete. Never enable destructive mirror/delete behavior without an explicit reviewed migration plan.
 
 ## Handoff
 
-Follow the ai-master context handoff protocol. If a project handoff becomes necessary and no local convention exists yet, use `HANDOFF.md` in this repository. Do not create it preemptively while there is no useful handoff content.
+Follow the ai-master context handoff protocol. Use `HANDOFF.md` for useful unresolved cross-session context and keep GitHub Issues/PRs/Actions as the source for dynamic history.
