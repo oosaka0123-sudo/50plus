@@ -1,0 +1,88 @@
+name: PR checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required files and local links
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import sys
+
+          required = [
+              Path('index.html'),
+              Path('activities.html'),
+              Path('guides.html'),
+              Path('about.html'),
+              Path('contact.html'),
+              Path('assets/styles.css'),
+              Path('assets/main.js'),
+              Path('PROJECT_SPEC.md'),
+          ]
+
+          missing = [str(p) for p in required if not p.exists()]
+          if missing:
+              print('Missing required files:', ', '.join(missing))
+              sys.exit(1)
+
+          class LinkParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.links = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if tag in {'a', 'link', 'script'}:
+                      value = attrs.get('href') or attrs.get('src')
+                      if value:
+                          self.links.append(value)
+
+          errors = []
+          html_files = sorted(Path('.').glob('*.html'))
+          for html_file in html_files:
+              parser = LinkParser()
+              parser.feed(html_file.read_text(encoding='utf-8'))
+              for link in parser.links:
+                  if link.startswith(('#', 'mailto:', 'tel:', 'javascript:')):
+                      continue
+                  parsed = urlsplit(link)
+                  if parsed.scheme or parsed.netloc:
+                      continue
+                  target = parsed.path
+                  if not target or target == '/':
+                      continue
+                  target_path = (html_file.parent / target).resolve()
+                  try:
+                      target_path.relative_to(Path('.').resolve())
+                  except ValueError:
+                      errors.append(f'{html_file}: local link escapes repository: {link}')
+                      continue
+                  if not target_path.exists():
+                      errors.append(f'{html_file}: missing local target: {link}')
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+
+          print(f'Checked {len(html_files)} HTML files; required files and local links are valid.')
+          PY
+
+      - name: Reject common secret patterns in tracked source
+        run: |
+          if grep -RInE --exclude-dir=.git --exclude='*.md' '(BEGIN (RSA |OPENSSH )?PRIVATE KEY|ghp_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})' .; then
+            echo 'Potential secret pattern found.'
+            exit 1
+          fi
+          echo 'No common secret patterns found.'
