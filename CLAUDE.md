@@ -10,13 +10,15 @@ Before making changes:
 
 Current product: 50PLUS, an adult friendship / community information website.
 
-Current development preview: `https://oosaka0123-sudo.github.io/50plus/`
+Current development preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+
+Preview publishing: the already-enabled `oosaka0123-sudo/ai-agent` GitHub Pages workflow reads the latest public `oosaka0123-sudo/50plus` `main` and creates a temporary noindex preview artifact. This repository remains the SSOT; copied preview files are not committed to `ai-agent`.
 
 Planned final production URL after completion: `https://50plus.rss7.net`
 
 Development is remote-first via GitHub and Claude Code on the web. Use Issue/Branch/PR flow unless a project rule explicitly permits otherwise.
 
-During active development, GitHub Pages is the public preview environment. Do not treat Lolipop configuration as a development blocker and do not trigger final Lolipop migration unless the user explicitly moves the completed site to production.
+During active development, use the Pages bridge as the public preview environment. Do not treat dedicated 50PLUS Pages or Lolipop configuration as a development blocker and do not trigger final Lolipop migration unless the user explicitly moves the completed site to production.
 
 Do not commit secrets. Do not claim tests, deploys, connections or live verification unless actually observed.
 
