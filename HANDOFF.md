@@ -38,16 +38,21 @@ The repository-side MVP foundation is in place:
 
 ## Publishing decision
 
-The user has set a two-stage publishing plan:
+The user has set a two-stage publishing plan.
 
 ### Stage A — now / during development
 
-- Public preview: `https://oosaka0123-sudo.github.io/50plus/`
-- Hosting: GitHub Pages
-- Source: current `main` via GitHub Actions
-- Purpose: continue development, mobile checking, visual QA and stakeholder/client review until the site is considered complete
-- Preview HTML is deployed with `noindex,nofollow` injected into the Pages artifact so this temporary preview is not the final SEO destination
+- Active public preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+- Preview host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
+- Source of truth: current `oosaka0123-sudo/50plus` `main`
+- The ai-agent Pages build clones current public 50PLUS `main` read-only and generates only the runtime preview copy under its Pages artifact
+- copied 50PLUS files are not committed into `ai-agent`
+- all seven generated preview HTML pages are required to contain `noindex,nofollow`
+- the bridge refreshes periodically from current 50PLUS `main`
+- dedicated Pages for the `50plus` repository remains disabled; its local Pages workflow is retained as manual-only and is not the normal preview path
 - Lolipop configuration is **not** a blocker during this stage
+
+The bridge has been successfully deployed by the already-enabled ai-agent Pages workflow from both a review branch and merged ai-agent `main`, including seven HTML pages, CSS/JS validation, noindex verification, Pages artifact upload and deploy-pages success.
 
 ### Stage B — after completion
 
@@ -55,21 +60,15 @@ The user has set a two-stage publishing plan:
 - Final hosting: Lolipop
 - Migration is performed only after the user explicitly considers 50PLUS complete and moves it to final production
 - Existing manual Lolipop deployment/preflight paths are retained for that future stage
+- retire the temporary ai-agent Pages bridge after successful final production unless the user explicitly wants to keep it
 
 Do not prematurely switch the project back to Lolipop during normal development.
 
 ## Current incomplete handoff
 
-### GitHub Pages preview verification
+### Browser-level preview observation
 
-Repository work may prepare the Pages workflow, but do not claim the preview is live until:
-
-1. the Pages deployment workflow is merged to `main`
-2. GitHub Pages publishing source is enabled for GitHub Actions if required in repository Settings
-3. a Pages deployment run succeeds
-4. the published GitHub Pages URL is opened and verified
-
-If the repository setting is still disabled, report that exact one-time setting as the publication blocker.
+GitHub Actions deployment evidence for the active bridge is verified. If a task specifically requires browser-level live verification of a newly refreshed preview, distinguish that from Actions deployment evidence and use an available browser/web path rather than inventing visual confirmation.
 
 ### Claude authentication
 
@@ -92,7 +91,8 @@ That task is explicitly **ANALYSIS ONLY**:
 After reconciliation:
 
 - continue ordinary development through Issue → Branch → checks → PR → Merge
-- use GitHub Pages as the development preview
+- use `https://oosaka0123-sudo.github.io/ai-agent/50plus/` as the active development preview
+- treat this 50PLUS repository as the sole source of truth; do not edit generated preview copies elsewhere
 - use Browser QA as repository-native rendered evidence
 - if Claude authentication becomes available, verify the analysis-only Claude task according to its current Issue
 - do not request Lolipop secrets or trigger Lolipop deploy merely to continue development
@@ -108,7 +108,7 @@ Only when the user explicitly says the site is complete / ready for final produc
 5. run Lolipop preflight
 6. perform deliberate manual Lolipop deployment
 7. verify final domain pages, SEO files and 404 behavior
-8. decide whether to retire or retain the GitHub Pages preview
+8. retire the temporary ai-agent Pages bridge unless explicitly retained
 
 ## Do not store here
 
