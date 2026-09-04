@@ -1,0 +1,79 @@
+name: Deploy to Lolipop (manual only)
+
+# Initial 50PLUS deployment workflow.
+# Safety rule: this workflow is manual-only until the dedicated server directory
+# and repository secrets have been verified for 50PLUS.
+# It intentionally does NOT use mirror --delete.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-50plus-lolipop
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: lftp FTPS deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Validate deployment configuration
+        env:
+          FTP_SERVER: ${{ secrets.LOLIPOP_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.LOLIPOP_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.LOLIPOP_FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.LOLIPOP_FTP_SERVER_DIR }}
+        run: |
+          test -n "$FTP_SERVER" || { echo '::error::LOLIPOP_FTP_SERVER is not configured.'; exit 1; }
+          test -n "$FTP_USERNAME" || { echo '::error::LOLIPOP_FTP_USERNAME is not configured.'; exit 1; }
+          test -n "$FTP_PASSWORD" || { echo '::error::LOLIPOP_FTP_PASSWORD is not configured.'; exit 1; }
+          test -n "$FTP_SERVER_DIR" || { echo '::error::LOLIPOP_FTP_SERVER_DIR is not configured.'; exit 1; }
+          if [ "$FTP_SERVER" != "ftp.lolipop.jp" ]; then
+            echo "::error::LOLIPOP_FTP_SERVER must be ftp.lolipop.jp for the verified Lolipop FTPS certificate pattern."
+            exit 1
+          fi
+          case "$FTP_SERVER_DIR" in
+            /|""|.)
+              echo '::error::Refusing to deploy to an empty or root directory.'
+              exit 1
+              ;;
+          esac
+          echo 'Deployment configuration passed non-secret validation.'
+
+      - name: Deploy site without remote deletion
+        env:
+          FTP_SERVER: ${{ secrets.LOLIPOP_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.LOLIPOP_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.LOLIPOP_FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.LOLIPOP_FTP_SERVER_DIR }}
+        run: |
+          lftp <<LFTP_EOF
+          set cmd:fail-exit true
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ftp:passive-mode true
+          set net:timeout 20
+          set net:max-retries 3
+          set net:reconnect-interval-base 5
+          open -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_SERVER"
+          mirror --reverse --verbose=1 \
+            --exclude '^\\.git/' \
+            --exclude '^\\.github/' \
+            --exclude '^README\\.md$' \
+            --exclude '^AGENTS\\.md$' \
+            --exclude '^CLAUDE\\.md$' \
+            --exclude '^PROJECT_SPEC\\.md$' \
+            --exclude '^HANDOFF\\.md$' \
+            --exclude '\\.gitkeep$' \
+            ./ "$FTP_SERVER_DIR"
+          bye
+          LFTP_EOF
