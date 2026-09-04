@@ -3,30 +3,39 @@
   const nav = document.querySelector('[data-site-nav]');
 
   if (button && nav) {
-    const closeMenu = () => {
-      nav.classList.remove('is-open');
-      button.setAttribute('aria-expanded', 'false');
+    const mobileNav = window.matchMedia('(max-width: 920px)');
+
+    const setMenuState = (isOpen, { restoreFocus = false } = {}) => {
+      const open = mobileNav.matches && isOpen;
+      nav.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', String(open));
+      button.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+      nav.toggleAttribute('inert', mobileNav.matches && !open);
+
+      if (restoreFocus && mobileNav.matches) button.focus();
     };
 
     button.addEventListener('click', () => {
-      const willOpen = !nav.classList.contains('is-open');
-      nav.classList.toggle('is-open', willOpen);
-      button.setAttribute('aria-expanded', String(willOpen));
+      setMenuState(!nav.classList.contains('is-open'));
     });
 
     nav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', closeMenu);
+      link.addEventListener('click', () => setMenuState(false));
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMenu();
+      if (event.key !== 'Escape' || !nav.classList.contains('is-open')) return;
+      setMenuState(false, { restoreFocus: true });
     });
 
     document.addEventListener('click', (event) => {
       if (!nav.classList.contains('is-open')) return;
       if (nav.contains(event.target) || button.contains(event.target)) return;
-      closeMenu();
+      setMenuState(false);
     });
+
+    mobileNav.addEventListener('change', () => setMenuState(false));
+    setMenuState(false);
   }
 
   const revealItems = document.querySelectorAll('.reveal');
