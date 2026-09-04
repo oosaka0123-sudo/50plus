@@ -4,7 +4,7 @@ Before making changes:
 
 1. Read the current default branch of `oosaka0123-sudo/ai-master`.
 2. Follow `ai-master/README.md` and `ai-master/AGENTS.md`.
-3. Read this repository's `AGENTS.md` and `README.md`.
+3. Read this repository's `AGENTS.md`, `README.md`, `PROJECT_SPEC.md` and `RUNBOOK.md`.
 4. Check open Issues, open PRs, latest Actions and current code.
 5. Use GitHub as SSOT. Do not rely on chat memory when GitHub differs.
 
