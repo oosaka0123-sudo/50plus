@@ -8,9 +8,12 @@
 
 ### Current development preview
 
-- GitHub Pages: `https://oosaka0123-sudo.github.io/50plus/`
-- Purpose: 完成までの公開確認・スマホ確認・クライアント/関係者確認
-- Preview HTML is deployed with `noindex,nofollow` injected by GitHub Actions so the temporary GitHub Pages site is not treated as the final SEO destination.
+- Active preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+- Host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
+- Source of truth remains this repository: `oosaka0123-sudo/50plus` `main`
+- The bridge reads current public `50plus/main` during the Pages build and publishes only runtime files under `/ai-agent/50plus/`.
+- Preview HTML is generated with `noindex,nofollow`; copied preview files are not committed back into `ai-agent`.
+- The bridge refreshes automatically on its Pages schedule, so normal 50PLUS development does not require enabling Pages in this repository.
 
 ### Final production target
 
@@ -18,7 +21,7 @@
 - Final hosting: Lolipop
 - Migration to Lolipop happens **after the site is considered complete and the user explicitly moves to final production**.
 
-GitHub Pages is therefore a temporary public development/preview environment, not a replacement for the final Lolipop production target.
+The GitHub Pages bridge is therefore a temporary public development/preview environment, not a replacement for the final Lolipop production target.
 
 ## Repository
 
@@ -35,9 +38,11 @@ Remote-first development:
 3. Implementation and test
 4. Pull Request / review
 5. Merge to `main`
-6. GitHub Actions publishes the current `main` to the GitHub Pages preview
-7. Continue development and QA on GitHub Pages until completion
+6. The existing `ai-agent` Pages bridge reads the latest 50PLUS `main` and refreshes the public preview
+7. Continue development and QA on the preview until completion
 8. After completion, perform the deliberate final migration to Lolipop and verify `https://50plus.rss7.net`
+
+The repository-local `.github/workflows/deploy-pages.yml` is manual-only while dedicated 50PLUS Pages remains disabled; it is not the active automatic preview path.
 
 ## Initial Product Scope
 
