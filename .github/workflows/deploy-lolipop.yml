@@ -1,27 +1,52 @@
-name: Deploy to Lolipop (manual only)
+name: Final migration to Lolipop (manual only)
 
-# Initial 50PLUS deployment workflow.
-# Safety rule: this workflow is manual-only until the dedicated server directory
-# and repository secrets have been verified for 50PLUS.
+# FUTURE FINAL-PRODUCTION WORKFLOW.
+# During active development, GitHub Pages is the preview environment.
+# Run this workflow only after the user explicitly declares 50PLUS complete
+# and chooses to migrate final production to Lolipop.
 # It intentionally does NOT use mirror --delete.
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm_final_migration:
+        description: 'Type FINAL only when 50PLUS is complete and ready for Lolipop production migration'
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-50plus-lolipop
+  group: deploy-50plus-lolipop-final
   cancel-in-progress: false
 
 jobs:
   deploy:
-    name: lftp FTPS deploy
+    name: Final FTPS deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Require explicit final-migration confirmation
+        env:
+          CONFIRM: ${{ inputs.confirm_final_migration }}
+        run: |
+          if [ "$CONFIRM" != "FINAL" ]; then
+            echo '::error::Final Lolipop migration is blocked. Type FINAL only after the user explicitly declares the site complete.'
+            exit 1
+          fi
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Build production artifact
+        run: |
+          set -euo pipefail
+          rm -rf _release
+          mkdir -p _release
+          cp index.html activities.html listings.html guides.html about.html contact.html 404.html robots.txt sitemap.xml _release/
+          cp -R assets _release/assets
+          touch _release/.nojekyll
+          echo 'Prepared runtime-only final production artifact.'
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -38,7 +63,7 @@ jobs:
           test -n "$FTP_PASSWORD" || { echo '::error::LOLIPOP_FTP_PASSWORD is not configured.'; exit 1; }
           test -n "$FTP_SERVER_DIR" || { echo '::error::LOLIPOP_FTP_SERVER_DIR is not configured.'; exit 1; }
           if [ "$FTP_SERVER" != "ftp.lolipop.jp" ]; then
-            echo "::error::LOLIPOP_FTP_SERVER must be ftp.lolipop.jp for the verified Lolipop FTPS certificate pattern."
+            echo '::error::LOLIPOP_FTP_SERVER must be ftp.lolipop.jp.'
             exit 1
           fi
           case "$FTP_SERVER_DIR" in
@@ -47,15 +72,16 @@ jobs:
               exit 1
               ;;
           esac
-          echo 'Deployment configuration passed non-secret validation.'
+          echo 'Final deployment configuration passed non-secret validation.'
 
-      - name: Deploy site without remote deletion
+      - name: Deploy production artifact without remote deletion
         env:
           FTP_SERVER: ${{ secrets.LOLIPOP_FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.LOLIPOP_FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.LOLIPOP_FTP_PASSWORD }}
           FTP_SERVER_DIR: ${{ secrets.LOLIPOP_FTP_SERVER_DIR }}
         run: |
+          cd _release
           lftp <<LFTP_EOF
           set cmd:fail-exit true
           set ftp:ssl-force true
@@ -65,15 +91,6 @@ jobs:
           set net:max-retries 3
           set net:reconnect-interval-base 5
           open -u "$FTP_USERNAME","$FTP_PASSWORD" "$FTP_SERVER"
-          mirror --reverse --verbose=1 \
-            --exclude '^\\.git/' \
-            --exclude '^\\.github/' \
-            --exclude '^README\\.md$' \
-            --exclude '^AGENTS\\.md$' \
-            --exclude '^CLAUDE\\.md$' \
-            --exclude '^PROJECT_SPEC\\.md$' \
-            --exclude '^HANDOFF\\.md$' \
-            --exclude '\\.gitkeep$' \
-            ./ "$FTP_SERVER_DIR"
+          mirror --reverse --verbose=1 ./ "$FTP_SERVER_DIR"
           bye
           LFTP_EOF
