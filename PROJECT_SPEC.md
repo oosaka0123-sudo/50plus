@@ -4,7 +4,8 @@
 
 - Name: **50PLUS**
 - Repository: `oosaka0123-sudo/50plus`
-- Planned public URL: `https://50plus.rss7.net`
+- Current development preview: `https://oosaka0123-sudo.github.io/50plus/`
+- Planned final production URL: `https://50plus.rss7.net`
 - Primary language: Japanese
 - Initial area focus: Osaka / Kansai, with a structure that can expand nationwide
 
@@ -149,29 +150,45 @@ Current implementation:
 - semantic HTML
 - accessible navigation and focus states
 - no external runtime dependency required for core UI
-- SEO title / description / canonical metadata for the planned domain
+- source HTML keeps canonical metadata for the planned final production domain
 - canonical verified-listing data in `data/verified-listings.json`
 - deterministic static HTML generation through `scripts/render_listings.py`
 - PR checks validate local links, common secret patterns, listing schema and JSON-to-HTML synchronization
 - scheduled CI checks verified event end dates and flags stale events for review rather than deleting or rewriting content automatically
-- path-filtered rendered Browser QA uses pinned Playwright/Chromium against a local GitHub Actions runner server for UI-affecting changes; it validates desktop/mobile layout and navigation behavior without contacting production
-- Browser QA stores reviewable desktop/mobile screenshot artifacts so rendered evidence is available even when the operator has no local browser environment
+- path-filtered rendered Browser QA uses pinned Playwright/Chromium against a local GitHub Actions runner server for UI-affecting changes
+- Browser QA stores reviewable desktop/mobile screenshot artifacts
+- GitHub Pages preview deployment builds a reduced static artifact containing only runtime site files
+- the GitHub Pages artifact injects `noindex,nofollow` into every preview HTML page at deploy time; source HTML is not polluted with staging-only robots metadata
+- final Lolipop deployment remains a separate future production migration path
 
-## 10. Development / Deployment
+## 10. Development / Publishing
 
 - GitHub is SSOT.
 - Follow `ai-master` and repository `AGENTS.md`.
 - Prefer Issue -> Branch -> Implementation -> Test -> PR -> Review -> Merge.
 - Claude Code on the web reads `CLAUDE.md` before implementation.
-- Deployment pattern is based on `claudecode-kyoshitsu`: GitHub Actions -> lftp -> Lolipop FTPS.
-- Initial workflow must remain `workflow_dispatch` only until Lolipop directory and GitHub Secrets are verified.
-- Initial deployment must not use `mirror --delete`.
-- Never commit secrets.
-- Detailed operational setup and maintenance procedures belong in `RUNBOOK.md`.
+
+### Stage A — development preview
+
+- Merge approved work to `main`.
+- GitHub Actions publishes the current `main` to `https://oosaka0123-sudo.github.io/50plus/`.
+- The preview deployment needs no FTP credentials or Lolipop secrets.
+- The preview is public for visual/functional review but deployed with `noindex,nofollow`.
+- Continue using PR checks and Browser QA throughout development.
+
+### Stage B — final production migration
+
+- Only after the user considers the site complete, migrate final production to Lolipop at `https://50plus.rss7.net`.
+- Keep the manual-only Lolipop workflow available for this later stage.
+- Before final migration, verify the dedicated Lolipop directory and required repository secrets.
+- Final migration must not use destructive `mirror --delete` unless separately reviewed and explicitly approved.
+- After final migration, verify live pages, SEO files and 404 behavior on the Lolipop domain.
+
+Detailed operational procedures belong in `RUNBOOK.md`.
 
 ## 11. Current Completion Definition
 
-The repository-side MVP foundation is complete when:
+The development-preview foundation is complete when:
 - the six primary public pages exist and share navigation / design
 - mobile navigation works
 - UI-affecting changes can pass repository-native rendered desktop/mobile Browser QA with reviewable screenshot evidence
@@ -179,7 +196,7 @@ The repository-side MVP foundation is complete when:
 - expired verified events are detectable by automated checks
 - no fabricated live listing facts are presented as real
 - static files and factual data changes are reviewable via PR
-- manual-only FTPS workflow exists without destructive delete sync
-- automatic deployment remains disabled until server settings are verified
+- GitHub Pages preview deployment can publish current `main` without FTP credentials
+- the preview remains `noindex,nofollow` until final production migration
 
-Human-only launch blockers such as Claude authentication and Lolipop deployment secrets are tracked separately and must not be guessed or bypassed by Agents.
+Final production completion is a separate milestone requiring explicit migration to Lolipop, successful deployment evidence and live verification of `https://50plus.rss7.net`.

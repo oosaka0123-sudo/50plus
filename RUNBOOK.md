@@ -4,12 +4,66 @@
 
 This file is the operational handoff for one-time setup and repeatable remote operation. GitHub is the SSOT; do not rely on chat memory when this file and current repository state are available.
 
-## Current public target
+## Publishing stages
+
+### Current development preview
 
 - Repository: `oosaka0123-sudo/50plus`
-- Planned URL: `https://50plus.rss7.net`
+- Preview URL: `https://oosaka0123-sudo.github.io/50plus/`
 - Default branch: confirm current GitHub state before work
-- Deployment target: Lolipop via FTPS
+- Preview deployment: GitHub Pages via GitHub Actions
+- Search policy: preview HTML is deployed with `noindex,nofollow`
+
+### Final production target
+
+- Final URL: `https://50plus.rss7.net`
+- Final hosting: Lolipop
+- Migration timing: only after the user considers the site complete and explicitly moves to final production
+
+Lolipop configuration is **not** a blocker for current development. Do not trigger the Lolipop workflow or request Lolipop secrets during the GitHub Pages development stage.
+
+## GitHub Pages preview deployment
+
+### Workflow
+
+`.github/workflows/deploy-pages.yml`
+
+Purpose:
+- publish current `main` for visual and functional review during development
+- require no FTP/FTPS credentials
+- publish only runtime static site files, not repository docs/scripts/data
+- inject `noindex,nofollow` into the deployed preview HTML without modifying source HTML
+
+Expected flow:
+1. Work through Issue → Branch → implementation → checks → PR.
+2. Require applicable `PR checks` and `Browser QA` before merge.
+3. Merge to `main`.
+4. `Deploy preview to GitHub Pages` runs from `main`.
+5. Confirm the Pages deployment succeeds.
+6. Verify `https://oosaka0123-sudo.github.io/50plus/` in a browser.
+
+The GitHub Pages repository setting must use **Settings → Pages → Build and deployment → Source: GitHub Actions**. If that one-time setting is not enabled, record it as the publication blocker instead of claiming the site is live.
+
+### Preview artifact
+
+The Pages workflow publishes:
+- `index.html`
+- `activities.html`
+- `listings.html`
+- `guides.html`
+- `about.html`
+- `contact.html`
+- `404.html`
+- `assets/`
+- `.nojekyll`
+
+Repository-only docs, workflows, canonical JSON and scripts are intentionally not part of the public preview artifact.
+
+The deploy job injects this into each preview HTML page:
+
+`<meta name="robots" content="noindex,nofollow">`
+
+Do not add this staging-only tag permanently to source HTML unless the publication policy changes.
 
 ## Claude Code Issue automation
 
@@ -30,13 +84,10 @@ Therefore the trigger path is verified; the remaining blocker is authentication.
 Configure **one** supported GitHub Actions repository secret:
 
 Option A:
-- Secret name: `ANTHROPIC_API_KEY`
-- Value: an Anthropic API key created by the human account owner
+- `ANTHROPIC_API_KEY`
 
 Option B:
-- Secret name: `CLAUDE_CODE_OAUTH_TOKEN`
-- Value: a Claude Code OAuth token
-- Anthropic's Claude Code Action setup documentation states that Claude Pro/Max users can generate this token with `claude setup-token` locally
+- `CLAUDE_CODE_OAUTH_TOKEN`
 
 Never write either secret value into Issues, PRs, commits, README, RUNBOOK, logs or chat screenshots.
 
@@ -44,45 +95,15 @@ Never write either secret value into Issues, PRs, commits, README, RUNBOOK, logs
 
 Repository → Settings → Secrets and variables → Actions → New repository secret
 
-Add exactly one of the supported secret names above.
-
 After authentication is configured:
 1. Open the target GitHub Issue.
 2. Confirm no other Agent is actively working on the same Issue.
-3. Read the Issue task mode before triggering Claude:
-   - if it explicitly says `ANALYSIS ONLY`, no repository changes, no Branch/Commit/PR, or equivalent, treat it as analysis-only
-   - otherwise treat it as an implementation task
+3. Read the Issue task mode before triggering Claude.
 4. The repository OWNER posts a new comment containing `@claude`.
-5. Confirm `Claude Code Issue Task` starts in Actions.
-6. Confirm the authentication check passes.
-7. For an analysis-only Issue, confirm Claude does **not** create or modify files, branches, commits or PRs and returns only the requested Issue analysis.
-8. For an implementation Issue, Claude must use a dedicated branch, run relevant checks, and create/update a PR.
-9. Do not auto-merge implementation PRs; review evidence first.
-
-### Task-mode safety
-
-The target Issue's explicit scope and task-mode constraints override the default implementation workflow.
-
-For `ANALYSIS ONLY` Issues:
-- repository reads are allowed
-- repository mutations are forbidden
-- no Branch / Commit / Pull Request should be created
-- the requested analysis belongs in the Issue conversation
-
-For implementation Issues:
-- use Issue → dedicated Branch → implementation → checks → PR
-- never commit directly to `main`
-
-### Trigger safety
-
-The workflow is intentionally bounded:
-- only newly created Issue comments are considered
-- comment must contain `@claude`
-- comment author association must be `OWNER`
-- bot comments are excluded
-- no automatic deploy is included
-- no automatic merge is included
-- secret mutation is outside Claude's task scope
+5. Confirm `Claude Code Issue Task` starts and authentication passes.
+6. For `ANALYSIS ONLY`, Claude must not create/modify files, branches, commits or PRs.
+7. For implementation tasks, Claude uses a dedicated branch, relevant checks and a PR.
+8. Do not auto-merge implementation PRs without reviewing evidence.
 
 ## Rendered browser QA
 
@@ -93,11 +114,9 @@ The workflow is intentionally bounded:
 Purpose:
 - provide repeatable rendered desktop/mobile evidence without requiring a local browser
 - test checked-out repository files through a local HTTP server on the GitHub Actions runner
-- never use the production URL, deployment credentials or deployment workflow
+- never depend on either the GitHub Pages preview or the Lolipop production URL
 
-The workflow runs automatically for UI-affecting pull requests and can also be started with `workflow_dispatch`.
-
-Current rendered coverage:
+Current coverage:
 - HOME
 - Activities
 - Listings
@@ -114,74 +133,57 @@ Checks include:
 - successful local page response
 - visible primary H1
 - no horizontal page overflow
-- desktop navigation visible and non-inert
-- mobile menu closed/inert state, open state, keyboard Tab entry, Escape close and focus restoration
-- reveal elements reaching their settled visible state before screenshots are captured
+- desktop navigation state
+- mobile menu closed/open state, keyboard Tab entry, Escape close and focus restoration
+- reveal elements reaching their settled visible state before screenshots
 
-### Screenshot evidence
-
-Each successful or failed run attempts to upload the `browser-qa-screenshots` artifact with full-page PNGs for all page/viewport combinations. The current workflow retains the artifact for 14 days.
+Each run attempts to upload `browser-qa-screenshots` with full-page PNG evidence.
 
 For UI-affecting PRs:
 1. Wait for both `PR checks` and `Browser QA`.
 2. Require both to pass before merge.
-3. Review the screenshot artifact when the change can affect layout, navigation, typography, spacing or interaction.
-4. If Browser QA fails, inspect both the error output and screenshots; do not treat a generated artifact by itself as proof of success.
+3. Review screenshots when layout/navigation/typography/spacing/interaction can change.
 
-Before first deployment, manually run `Browser QA` on the intended current `main` release and review its artifact in addition to the normal deployment preflight.
+## Final Lolipop migration — future stage only
 
-## Lolipop deployment
+### Existing workflows
 
-### Workflow
+- `.github/workflows/deploy-preflight.yml`
+- `.github/workflows/deploy-lolipop.yml`
 
-`.github/workflows/deploy-lolipop.yml`
+These are preserved for the **final production migration after completion**. They are not part of the current GitHub Pages preview flow.
 
-Current safety state:
-- manual `workflow_dispatch` only
-- automatic deployment from `main` is disabled
-- `mirror --delete` is not used
-- repository/dev files are excluded from upload
-- root/empty remote directory is rejected
+Current safety characteristics:
+- manual-only
+- no automatic Lolipop deployment from `main`
+- no `mirror --delete`
+- repository/dev files excluded from upload
+- root/empty remote directory rejected
 
-### Required repository secrets
+### Required future repository secrets
 
-The current workflow expects these four GitHub Actions repository secrets:
-
+At final migration only, the existing Lolipop workflow expects:
 - `LOLIPOP_FTP_SERVER`
 - `LOLIPOP_FTP_USERNAME`
 - `LOLIPOP_FTP_PASSWORD`
 - `LOLIPOP_FTP_SERVER_DIR`
 
-Do not store their values in this repository.
+Never store their values in repository files or chat.
 
-### Verified workflow constraint
+### Final migration prerequisites
 
-The workflow currently validates:
-- `LOLIPOP_FTP_SERVER` must be `ftp.lolipop.jp`
-- all four values must be non-empty
-- `LOLIPOP_FTP_SERVER_DIR` must not be empty, `.` or `/`
+Before final Lolipop deployment:
+1. User explicitly confirms 50PLUS is ready for final production migration.
+2. Confirm `main` is the intended final release.
+3. Re-run/confirm PR checks and Browser QA evidence.
+4. Human verifies the `50plus.rss7.net` subdomain and its dedicated Lolipop directory.
+5. Human configures the four Lolipop repository secrets.
+6. Run the Lolipop preflight and require success.
+7. Run the manual Lolipop deploy.
+8. Verify `https://50plus.rss7.net/`, all primary pages, `robots.txt`, `sitemap.xml` and 404 behavior.
+9. Confirm final SEO behavior and retire GitHub Pages as the active public preview if appropriate.
 
-### Before first deployment
-
-Human must verify in Lolipop control panel:
-1. subdomain `50plus.rss7.net` exists
-2. its dedicated public directory is known exactly
-3. FTP username/password are the intended Lolipop account credentials
-4. the target directory is isolated from other websites
-
-Then add the four repository secrets.
-
-### First deployment sequence
-
-1. Confirm `main` contains the intended release.
-2. Confirm PR checks and Browser QA are green for the intended release.
-3. Confirm no secret values are present in tracked files.
-4. Open GitHub Actions → `Deploy to Lolipop (manual only)`.
-5. Run the workflow manually.
-6. Inspect the workflow result.
-7. Verify `https://50plus.rss7.net/` in a browser.
-8. Verify at least HOME, Activities, Listings, Guides, About, Contact, `robots.txt`, `sitemap.xml`, and a nonexistent URL for 404 behavior.
-9. Record the deployment evidence in the relevant Issue/PR.
+Do not mark final production complete until live verification succeeds.
 
 ## Verified listings maintenance
 
@@ -197,10 +199,9 @@ Do not hand-edit the generated verified-listing cards in `listings.html`. The ge
 
 1. Re-check the official source before changing a listing.
 2. Update only verified facts in `data/verified-listings.json`.
-3. Update `verified_at` for the record when it is actually re-verified.
-4. For `kind: event`, maintain machine-readable `start_date` and `end_date` in `YYYY-MM-DD` format in addition to the human-readable `schedule`.
-5. Run:
-   `python3 scripts/render_listings.py`
+3. Update `verified_at` only when actually re-verified.
+4. For events, maintain `start_date` and `end_date` in `YYYY-MM-DD`.
+5. Run `python3 scripts/render_listings.py`.
 6. Review the generated `listings.html` diff.
 7. Run or wait for PR checks.
 8. Merge only after JSON validation, HTML sync, local-link and secret-pattern checks pass.
@@ -209,12 +210,7 @@ Do not hand-edit the generated verified-listing cards in `listings.html`. The ge
 
 The PR/static-check workflow also runs daily at `21:00 UTC` (06:00 JST).
 
-For verified events:
-- missing or malformed `start_date` / `end_date` fails validation
-- `start_date` after `end_date` fails validation
-- an `end_date` earlier than the current date fails validation
-
-A scheduled failure does not automatically delete or rewrite an event. It is a review signal: verify the official source, then remove, replace, archive or otherwise reclassify the record deliberately.
+A scheduled stale-event failure is a review signal only. Verify the official source, then deliberately remove, replace, archive or reclassify the record.
 
 ## Project boundary
 
@@ -227,6 +223,6 @@ Never fabricate live venue/event facts, schedules, prices, ratings, participant 
 For implementation tasks prefer:
 Issue → Active Owner → Branch → Implementation → Test → PR → Review → Merge.
 
-For analysis-only tasks, follow the Issue's requested output without creating repository mutations.
+For analysis-only tasks, follow the Issue's requested output without repository mutations.
 
-For long AI sessions, write a repository handoff instead of depending on conversation history.
+For long AI sessions, update `HANDOFF.md` instead of depending on conversation history.

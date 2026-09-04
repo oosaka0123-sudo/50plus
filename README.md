@@ -4,9 +4,21 @@
 
 趣味・イベント・地域交流を通じて、成人同士が自然につながれる場所や活動を紹介するWebプロジェクトです。
 
-## Public URL
+## Publishing targets
 
-- Planned: `https://50plus.rss7.net`
+### Current development preview
+
+- GitHub Pages: `https://oosaka0123-sudo.github.io/50plus/`
+- Purpose: 完成までの公開確認・スマホ確認・クライアント/関係者確認
+- Preview HTML is deployed with `noindex,nofollow` injected by GitHub Actions so the temporary GitHub Pages site is not treated as the final SEO destination.
+
+### Final production target
+
+- Planned final URL: `https://50plus.rss7.net`
+- Final hosting: Lolipop
+- Migration to Lolipop happens **after the site is considered complete and the user explicitly moves to final production**.
+
+GitHub Pages is therefore a temporary public development/preview environment, not a replacement for the final Lolipop production target.
 
 ## Repository
 
@@ -23,9 +35,9 @@ Remote-first development:
 3. Implementation and test
 4. Pull Request / review
 5. Merge to `main`
-6. GitHub Actions deployment to Lolipop after this project's deployment configuration is verified
-
-The deployment architecture will be based on the proven `oosaka0123-sudo/claudecode-kyoshitsu` pattern, adapted specifically for the 50PLUS server directory and safety requirements.
+6. GitHub Actions publishes the current `main` to the GitHub Pages preview
+7. Continue development and QA on GitHub Pages until completion
+8. After completion, perform the deliberate final migration to Lolipop and verify `https://50plus.rss7.net`
 
 ## Initial Product Scope
 
