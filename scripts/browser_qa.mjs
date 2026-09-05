@@ -48,6 +48,70 @@ const settleRevealAnimations = async (page) => {
   await page.waitForTimeout(80);
 };
 
+const checkListingsFilters = async (page, prefix) => {
+  const search = page.locator('[data-listing-search]');
+  const count = page.locator('[data-listing-count]');
+  const empty = page.locator('[data-listing-empty]');
+  const allButton = page.locator('[data-listing-kind="all"]');
+  const eventButton = page.locator('[data-listing-kind="event"]');
+  const cards = page.locator('[data-listing-card]');
+  const eventCards = page.locator('[data-listing-card][data-kind="event"]');
+  const resourceCards = page.locator('[data-listing-card][data-kind="resource"]');
+  const resourceSection = page.locator('[data-listing-section="resource"]');
+  const eventSection = page.locator('[data-listing-section="event"]');
+  const visibleCards = () => page.locator('[data-listing-card]:visible').count();
+
+  record((await search.count()) === 1, `${prefix}: listing search input not found`);
+  record((await count.count()) === 1, `${prefix}: listing result count not found`);
+  record((await allButton.count()) === 1, `${prefix}: all listings filter not found`);
+  record((await eventButton.count()) === 1, `${prefix}: event listings filter not found`);
+
+  if ((await search.count()) !== 1 || (await allButton.count()) !== 1 || (await eventButton.count()) !== 1) return;
+
+  const totalCards = await cards.count();
+  const totalEvents = await eventCards.count();
+  const totalResources = await resourceCards.count();
+  record(totalCards > 0, `${prefix}: expected at least one verified listing`);
+  record((await visibleCards()) === totalCards, `${prefix}: not all listings are visible before filtering`);
+  record((await count.textContent())?.trim() === `${totalCards}件を表示中`, `${prefix}: initial result count is incorrect`);
+
+  if (totalCards > 0) {
+    const firstTitle = (await cards.first().locator('h3').textContent())?.trim() || '';
+    const cardTexts = await cards.allTextContents();
+    const expectedMatches = cardTexts.filter((text) => text.includes(firstTitle)).length;
+
+    await search.fill(firstTitle);
+    await page.waitForTimeout(60);
+    record((await visibleCards()) === expectedMatches, `${prefix}: keyword search result count is incorrect`);
+    record((await count.textContent())?.trim() === `${expectedMatches}件を表示中`, `${prefix}: keyword result label is incorrect`);
+  }
+
+  await search.fill('');
+  if (totalEvents > 0) {
+    await eventButton.click();
+    await page.waitForTimeout(60);
+    record((await eventButton.getAttribute('aria-pressed')) === 'true', `${prefix}: event filter aria state is incorrect`);
+    record((await visibleCards()) === totalEvents, `${prefix}: event filter result count is incorrect`);
+    record((await count.textContent())?.trim() === `${totalEvents}件を表示中`, `${prefix}: event result label is incorrect`);
+    record(await eventSection.isVisible(), `${prefix}: event section should remain visible for event-only filtering`);
+    if (totalResources > 0) record(await resourceSection.isHidden(), `${prefix}: resource section should hide for event-only filtering`);
+  }
+
+  await allButton.click();
+  await search.fill('50PLUS-NO-MATCH-QUERY');
+  await page.waitForTimeout(60);
+  record((await visibleCards()) === 0, `${prefix}: no-match search should show zero cards`);
+  record(await empty.isVisible(), `${prefix}: no-match message is not visible`);
+  record((await count.textContent())?.trim() === '0件を表示中', `${prefix}: no-match result count is incorrect`);
+
+  await search.fill('');
+  await allButton.click();
+  await page.waitForTimeout(60);
+  record((await visibleCards()) === totalCards, `${prefix}: reset did not restore all listings`);
+  if (totalResources > 0) record(await resourceSection.isVisible(), `${prefix}: resource section did not return after reset`);
+  if (totalEvents > 0) record(await eventSection.isVisible(), `${prefix}: event section did not return after reset`);
+};
+
 await mkdir(screenshotDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
@@ -129,6 +193,7 @@ try {
           }
 
           await settleRevealAnimations(page);
+          if (pageName === 'listings') await checkListingsFilters(page, prefix);
         } catch (error) {
           errors.push(`${prefix}: ${error instanceof Error ? error.message : String(error)}`);
         } finally {

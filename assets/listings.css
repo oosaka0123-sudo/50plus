@@ -1,0 +1,116 @@
+.listings-tools {
+  padding-top: 0;
+}
+
+.listing-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  gap: 32px;
+  align-items: end;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.listing-filter-copy h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.listing-filter-copy p:last-child {
+  margin: 14px 0 0;
+  color: var(--muted);
+}
+
+.listing-filter-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.listing-search-label {
+  font-weight: 800;
+}
+
+.listing-search-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+
+.listing-search-input:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(23, 32, 51, 0.08);
+}
+
+.listing-kind-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.listing-filter-button {
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.listing-filter-button:hover,
+.listing-filter-button:focus-visible {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.listing-filter-button.is-active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+.listing-result-count,
+.listing-empty {
+  margin: 0;
+  font-weight: 700;
+}
+
+.listing-result-count {
+  color: var(--muted);
+}
+
+.listing-empty {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 128, 95, 0.12);
+  color: var(--ink);
+}
+
+[data-listing-card][hidden],
+[data-listing-section][hidden],
+[data-listing-empty][hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .listing-filter-panel {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 22px;
+  }
+
+  .listing-filter-button {
+    flex: 1 1 auto;
+  }
+}
