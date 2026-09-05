@@ -27,6 +27,14 @@ def ja_date(value: str) -> str:
     return f"{parsed.year}年{parsed.month}月{parsed.day}日"
 
 
+def listing_attributes(item: dict) -> str:
+    return (
+        'data-listing-card '
+        f'data-kind="{esc(item.get("kind", ""))}" '
+        f'data-category="{esc(item.get("category", ""))}"'
+    )
+
+
 def source_buttons(item: dict, *, primary: bool) -> str:
     urls = item.get("source_urls", [])
     css = "button button-primary" if primary else "button button-ghost"
@@ -50,7 +58,7 @@ def render_resource(item: dict, number: int) -> str:
         details.append(f'<p><strong>カテゴリー：</strong>{esc(item["category"])}</p>')
 
     return (
-        f'    <article class="card reveal"><span class="card-number">{number:02d}</span>'
+        f'    <article class="card reveal" {listing_attributes(item)}><span class="card-number">{number:02d}</span>'
         f'<h3>{esc(item["name"])}</h3><p>{esc(item["summary"])}</p>'
         + "".join(details)
         + source_buttons(item, primary=False)
@@ -81,7 +89,7 @@ def render_event(item: dict, number: int) -> str:
         )
 
     return (
-        f'    <article class="card reveal" style="color:var(--ink)"><span class="card-number">{number:02d}</span>'
+        f'    <article class="card reveal" style="color:var(--ink)" {listing_attributes(item)}><span class="card-number">{number:02d}</span>'
         f'<h3>{esc(item["name"])}</h3><p>{esc(item["summary"])}</p>'
         + "".join(details)
         + note
@@ -108,19 +116,20 @@ def render_block(data: dict) -> str:
         number += 1
 
     parts = [
+        f'  <section class="section-tight listings-tools" data-listing-filters aria-labelledby="listing-filter-title"><div class="container"><div class="listing-filter-panel"><div class="listing-filter-copy"><p class="eyebrow">Find verified activities</p><h2 id="listing-filter-title">確認済み情報を絞り込む。</h2><p>名前、エリア、カテゴリー、会場などをキーワードで検索できます。</p></div><div class="listing-filter-controls"><label class="listing-search-label" for="listing-search">キーワード検索</label><input class="listing-search-input" id="listing-search" type="search" placeholder="例：梅田、語学、ボランティア" autocomplete="off" data-listing-search><div class="listing-kind-filter" role="group" aria-label="情報の種類"><button class="listing-filter-button is-active" type="button" data-listing-kind="all" aria-pressed="true">すべて</button><button class="listing-filter-button" type="button" data-listing-kind="resource" aria-pressed="false">継続情報</button><button class="listing-filter-button" type="button" data-listing-kind="event" aria-pressed="false">開催イベント</button></div><p class="listing-result-count" aria-live="polite" data-listing-count>{len(items)}件を表示中</p><p class="listing-empty" hidden data-listing-empty>条件に合う確認済み情報はありません。検索語や種類を変えてください。</p></div></div></div></section>',
         f'  <section class="section-tight"><div class="narrow"><div class="notice"><strong>最終確認日：{verified_at}</strong><br>参加者の男女比、年齢層、雰囲気、人気度など、公式に確認できない情報は掲載していません。イベント情報は変更・中止の可能性があるため、申込前に必ず公式ページを確認してください。</div></div></section>',
     ]
 
     if resource_cards:
         parts.append(
-            '  <section class="section"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">Ongoing resources</p><h2>まず相談・検索から<br>始められる場所。</h2></div><p>単発イベントだけでなく、継続的に活動を探せる公式の情報窓口も掲載します。</p></div><div class="card-grid">\n'
+            '  <section class="section" data-listing-section="resource"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">Ongoing resources</p><h2>まず相談・検索から<br>始められる場所。</h2></div><p>単発イベントだけでなく、継続的に活動を探せる公式の情報窓口も掲載します。</p></div><div class="card-grid">\n'
             + "\n".join(resource_cards)
             + "\n  </div></div></section>"
         )
 
     if event_cards:
         parts.append(
-            f'  <section class="section section-dark"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">Upcoming verified events</p><h2>開催予定を確認できた<br>学び・ものづくり。</h2></div><p>50PLUSが{verified_at}に公式情報で確認した内容です。</p></div><div class="card-grid">\n'
+            f'  <section class="section section-dark" data-listing-section="event"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">Upcoming verified events</p><h2>開催予定を確認できた<br>学び・ものづくり。</h2></div><p>50PLUSが{verified_at}に公式情報で確認した内容です。</p></div><div class="card-grid">\n'
             + "\n".join(event_cards)
             + "\n  </div></div></section>"
         )
