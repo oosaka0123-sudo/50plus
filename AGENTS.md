@@ -32,6 +32,20 @@ Age-related editorial content is allowed when it is respectful, adult-only and r
 - Do not invent deployment state, URLs, credentials, test results or external service connections.
 - Code generation alone is not completion. Report evidence for relevant test / PR / CI / deploy / live verification steps.
 
+## Chat persistence / knowledge routing
+
+When the user says `このチャット内容をリポジトリに保存して` or gives an equivalent instruction, do not copy the raw conversation log into the repository. Normalize only durable or restart-critical information and route it to the existing Project source of truth.
+
+- Before writing, re-read the current default branch and the relevant canonical files, plus related Issue / PR / Actions when needed.
+- Current confirmed project specification or operating state -> update the existing `PROJECT_SPEC.md`, `README.md`, or other clearly responsible canonical document in place.
+- Important long-lived design rationale -> create or update `DECISIONS.md` only when such a decision actually exists.
+- Reusable operational procedure -> create or update `RUNBOOK.md` only when a reusable procedure actually exists.
+- Unfinished work needed by the next AI/session -> use the Project handoff location defined by `ai-master`; if no dedicated location exists, use `HANDOFF.md`. Create it only when needed.
+- Work history already recoverable from code, Issue, Pull Request, Actions, or Commit history -> do not duplicate it into Markdown.
+- Prefer replacing stale current-state text over append-only chat summaries.
+- Never save secrets, credentials, tokens, passwords, private user data, or other confidential values as chat persistence.
+- After saving, report which canonical files changed and what was intentionally not duplicated.
+
 ## Publishing / Deployment
 
 ### Current preview stage
