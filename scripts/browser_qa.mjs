@@ -48,6 +48,54 @@ const settleRevealAnimations = async (page) => {
   await page.waitForTimeout(80);
 };
 
+const checkListingsFilters = async (page, prefix) => {
+  const search = page.locator('[data-listing-search]');
+  const count = page.locator('[data-listing-count]');
+  const empty = page.locator('[data-listing-empty]');
+  const allButton = page.locator('[data-listing-kind="all"]');
+  const eventButton = page.locator('[data-listing-kind="event"]');
+  const resourceSection = page.locator('[data-listing-section="resource"]');
+  const eventSection = page.locator('[data-listing-section="event"]');
+  const visibleCards = () => page.locator('[data-listing-card]:visible').count();
+
+  record((await search.count()) === 1, `${prefix}: listing search input not found`);
+  record((await count.count()) === 1, `${prefix}: listing result count not found`);
+  record((await allButton.count()) === 1, `${prefix}: all listings filter not found`);
+  record((await eventButton.count()) === 1, `${prefix}: event listings filter not found`);
+
+  if ((await search.count()) !== 1 || (await allButton.count()) !== 1 || (await eventButton.count()) !== 1) return;
+
+  record((await visibleCards()) === 4, `${prefix}: expected four listings before filtering`);
+
+  await search.fill('中国語');
+  await page.waitForTimeout(60);
+  record((await visibleCards()) === 1, `${prefix}: keyword search did not reduce listings to one result`);
+  record((await count.textContent())?.trim() === '1件を表示中', `${prefix}: keyword result count is incorrect`);
+  record(await resourceSection.isHidden(), `${prefix}: resource section should hide for the 中国語 search`);
+  record(await eventSection.isVisible(), `${prefix}: event section should remain visible for the 中国語 search`);
+
+  await search.fill('');
+  await eventButton.click();
+  await page.waitForTimeout(60);
+  record((await eventButton.getAttribute('aria-pressed')) === 'true', `${prefix}: event filter aria state is incorrect`);
+  record((await visibleCards()) === 2, `${prefix}: event filter did not show two events`);
+  record(await resourceSection.isHidden(), `${prefix}: resource section should hide for event-only filtering`);
+
+  await allButton.click();
+  await search.fill('該当しない検索語');
+  await page.waitForTimeout(60);
+  record((await visibleCards()) === 0, `${prefix}: no-match search should show zero cards`);
+  record(await empty.isVisible(), `${prefix}: no-match message is not visible`);
+  record((await count.textContent())?.trim() === '0件を表示中', `${prefix}: no-match result count is incorrect`);
+
+  await search.fill('');
+  await allButton.click();
+  await page.waitForTimeout(60);
+  record((await visibleCards()) === 4, `${prefix}: reset did not restore all listings`);
+  record(await resourceSection.isVisible(), `${prefix}: resource section did not return after reset`);
+  record(await eventSection.isVisible(), `${prefix}: event section did not return after reset`);
+};
+
 await mkdir(screenshotDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
@@ -129,6 +177,7 @@ try {
           }
 
           await settleRevealAnimations(page);
+          if (pageName === 'listings') await checkListingsFilters(page, prefix);
         } catch (error) {
           errors.push(`${prefix}: ${error instanceof Error ? error.message : String(error)}`);
         } finally {
