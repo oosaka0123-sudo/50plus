@@ -10,15 +10,17 @@ Before making changes:
 
 Current product: 50PLUS, an adult friendship / community information website.
 
-Current development preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+Production URL: `https://50plus.rss7.net`
 
-Preview publishing: the already-enabled `oosaka0123-sudo/ai-agent` GitHub Pages workflow reads the latest public `oosaka0123-sudo/50plus` `main` and creates a temporary noindex preview artifact. This repository remains the SSOT; copied preview files are not committed to `ai-agent`.
+Primary production publishing: dedicated GitHub Pages for `oosaka0123-sudo/50plus`, using `.github/workflows/deploy-pages.yml` from approved `main`.
 
-Planned final production URL after completion: `https://50plus.rss7.net`
+Temporary preview while dedicated Pages/custom-domain activation is incomplete: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`. The `ai-agent` bridge is preview-only, injects `noindex,nofollow`, and is not another source of truth.
 
 Development is remote-first via GitHub and Claude Code on the web. Use Issue/Branch/PR flow unless a project rule explicitly permits otherwise.
 
-During active development, use the Pages bridge as the public preview environment. Do not treat dedicated 50PLUS Pages or Lolipop configuration as a development blocker and do not trigger final Lolipop migration unless the user explicitly moves the completed site to production.
+Do not treat Lolipop as the normal production path. Existing Lolipop workflows are manual fallback only. Do not request or modify Lolipop secrets merely to continue development or GitHub Pages production.
+
+Do not claim production complete until dedicated Pages is enabled, the production workflow succeeds, the custom domain/DNS is configured, and `https://50plus.rss7.net` is live-verified.
 
 ## Google Media MCP — fast connection path
 
