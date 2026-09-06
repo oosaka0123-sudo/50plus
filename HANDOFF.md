@@ -58,24 +58,30 @@ The user has decided to use **dedicated GitHub Pages as the primary production h
 - Preview remains `noindex,nofollow`
 - Preview evidence must not be reported as production evidence
 
-### Human-owned activation still required
+### Activation progress
 
-Repository changes cannot finish these one-time settings:
+Observed on 2026-09-06 JST:
 
-1. enable dedicated GitHub Pages for `oosaka0123-sudo/50plus` with GitHub Actions as the source
-2. configure custom domain `50plus.rss7.net`
-3. configure DNS CNAME for `50plus` to `oosaka0123-sudo.github.io`
-4. complete GitHub custom-domain/DNS verification and HTTPS enablement
-5. require successful `Deploy 50PLUS GitHub Pages`
+- Repository `Settings -> Pages` is authenticated and accessible.
+- Pages publishing `Source` was changed from `Deploy from a branch` to **GitHub Actions** and GitHub displayed the saved confirmation.
+- This completes the one-time repository source-selection step.
+
+Remaining activation / production verification:
+
+1. trigger or allow a fresh `Deploy 50PLUS GitHub Pages` run after the source change and require actual build + deploy success
+2. verify the default dedicated Pages URL becomes live
+3. configure custom domain `50plus.rss7.net`
+4. configure DNS CNAME for `50plus` to `oosaka0123-sudo.github.io`
+5. complete GitHub custom-domain/DNS verification and HTTPS enablement
 6. live-verify the custom domain and SEO files
 
 Until these are observed, do not claim final production activation is complete.
 
 ## Current incomplete handoff
 
-### Dedicated Pages activation / live verification
+### Dedicated Pages deployment / custom-domain live verification
 
-Repository-side production workflow and documentation may be prepared through Issue/Branch/PR, but dedicated Pages activation and DNS remain human/account-owned boundaries. Once activated, confirm the actual workflow run and live custom-domain behavior.
+The repository-side production workflow and Pages source selection are complete. The next required evidence is a fresh workflow run in which the production build and `deploy-pages` jobs actually execute successfully. After that, configure and verify `50plus.rss7.net` and its DNS/HTTPS state.
 
 ### Claude authentication
 
@@ -104,8 +110,8 @@ After reconciliation:
 - continue ordinary development through Issue -> Branch -> checks -> PR -> Merge
 - treat this 50PLUS repository as the sole source of truth
 - use Browser QA as repository-native rendered evidence
-- use the `ai-agent` URL only as the temporary noindex preview while dedicated Pages activation is incomplete
-- once dedicated Pages is enabled, use the repository-local Pages workflow as the normal production publishing path
+- use the `ai-agent` URL only as the temporary noindex preview until dedicated production is live-verified
+- use the repository-local Pages workflow as the normal production publishing path
 - keep Lolipop workflows only as manual fallback; do not request Lolipop secrets for routine publishing
 - if Claude authentication becomes available, verify the analysis-only Claude task according to its current Issue
 
