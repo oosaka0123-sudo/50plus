@@ -48,29 +48,33 @@ When the user says `このチャット内容をリポジトリに保存して` o
 
 ## Publishing / Deployment
 
-### Current preview stage
+### Production path
 
-Active preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+Production URL: `https://50plus.rss7.net`
 
-During active development, the already-enabled GitHub Pages site in `oosaka0123-sudo/ai-agent` acts as a temporary preview bridge. Its Pages build reads the current public `oosaka0123-sudo/50plus` `main`, generates only runtime preview files under `web/50plus/`, injects `noindex,nofollow`, and deploys them without committing copied 50PLUS files into `ai-agent`.
+Primary production hosting is dedicated GitHub Pages for `oosaka0123-sudo/50plus`.
 
-This repository remains the sole project/code/content SSOT. The bridge is a publishing mechanism only.
+- this repository remains the sole code/content SSOT
+- approved changes reach production from `main` through `.github/workflows/deploy-pages.yml`
+- the production Pages artifact must include the seven public HTML pages, `assets/`, `robots.txt` and `sitemap.xml`
+- production HTML must not contain the preview-only `noindex,nofollow` injection
+- canonical and Open Graph URLs remain on `https://50plus.rss7.net`
+- repository Pages enablement plus custom-domain/DNS configuration are one-time human-owned activation steps
+- never claim production complete until the dedicated Pages deployment and live custom-domain verification are observed
 
-The repository-local dedicated Pages workflow is manual-only while 50PLUS Pages itself remains disabled. Do not treat that disabled dedicated Pages setting as a development blocker while the bridge is healthy.
+### Preview bridge during activation/development
 
-### Final production stage
+Until dedicated Pages is fully activated and verified, the existing `oosaka0123-sudo/ai-agent` Pages site remains a temporary preview bridge at `https://oosaka0123-sudo.github.io/ai-agent/50plus/`.
 
-Planned final production URL: `https://50plus.rss7.net`
+The bridge reads the current public `50plus/main`, generates runtime preview files only, injects `noindex,nofollow`, and does not become another source of truth. Do not confuse preview deployment evidence with production deployment evidence.
 
-Final production hosting is Lolipop, but migration is deferred until the site is considered complete and the user explicitly moves the project to final production.
+### Lolipop fallback
 
-Until that final-migration decision:
-- do not treat Lolipop configuration as a blocker for normal development
-- do not trigger the Lolipop deploy workflow
-- do not request or modify Lolipop secret values
-- preserve the existing manual-only Lolipop path for future final migration
+The existing Lolipop preflight/deploy workflows are retained as a manual fallback only. They are not the normal production path.
 
-At final migration, verify the dedicated server directory, deployment exclusions, required secrets, Browser QA evidence and live site before declaring production complete. Never enable destructive mirror/delete behavior without an explicit reviewed migration plan.
+- do not request or modify Lolipop secrets for ordinary development or GitHub Pages production
+- do not trigger Lolipop deployment merely because GitHub Pages activation is pending
+- never enable destructive mirror/delete behavior without an explicit reviewed migration or recovery plan
 
 ## Handoff
 
