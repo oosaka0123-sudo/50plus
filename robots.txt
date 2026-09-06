@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://50plus.rss7.net/sitemap.xml
+Sitemap: https://oosaka0123-sudo.github.io/50plus/sitemap.xml
