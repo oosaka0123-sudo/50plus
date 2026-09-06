@@ -4,8 +4,9 @@
 
 - Name: **50PLUS**
 - Repository: `oosaka0123-sudo/50plus`
+- Production URL: `https://oosaka0123-sudo.github.io/50plus/`
+- Optional future custom domain: `https://50plus.rss7.net`
 - Temporary development preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
-- Production URL: `https://50plus.rss7.net`
 - Primary production hosting: dedicated GitHub Pages for this repository
 - Primary language: Japanese
 - Initial area focus: Osaka / Kansai, with a structure that can expand nationwide
@@ -151,7 +152,7 @@ Current implementation:
 - semantic HTML
 - accessible navigation and focus states
 - no external runtime dependency required for core UI
-- source HTML canonical / OG metadata targets `https://50plus.rss7.net`
+- source HTML canonical / OG metadata targets `https://oosaka0123-sudo.github.io/50plus/`
 - canonical verified-listing data in `data/verified-listings.json`
 - deterministic static HTML generation through `scripts/render_listings.py`
 - PR checks validate local links, common secret patterns, listing schema and JSON-to-HTML synchronization
@@ -160,8 +161,8 @@ Current implementation:
 - Browser QA stores reviewable desktop/mobile screenshot artifacts
 - production publishing uses repository-local `.github/workflows/deploy-pages.yml`
 - the production artifact contains seven runtime HTML pages, `assets/`, `robots.txt`, `sitemap.xml` and `.nojekyll`
-- the production workflow verifies generated listings, rejects preview-only `noindex,nofollow`, and checks the expected production origin
-- the existing `ai-agent` Pages bridge remains temporary preview-only during activation and continues to inject `noindex,nofollow`
+- the production workflow verifies generated listings, rejects preview-only `noindex,nofollow`, and checks the expected GitHub Pages production origin
+- the existing `ai-agent` Pages bridge remains preview-only and continues to inject `noindex,nofollow`
 - this repository remains the sole 50PLUS source of truth
 - existing Lolipop workflows remain manual fallback paths, not the primary production architecture
 
@@ -175,21 +176,22 @@ Current implementation:
 ### Production — dedicated GitHub Pages
 
 - Approved work is merged to this repository's `main`.
-- When dedicated Pages is enabled, `.github/workflows/deploy-pages.yml` publishes `main` automatically and also supports manual dispatch.
-- Production is intended to resolve at `https://50plus.rss7.net` through GitHub Pages custom-domain configuration and DNS.
-- Production pages are indexable and must not contain staging-only `noindex,nofollow`.
-- `robots.txt` and `sitemap.xml` must be deployed with the site.
-- Do not mark a release complete merely because the repository workflow is present; require actual Pages deployment evidence and live-domain verification.
+- `.github/workflows/deploy-pages.yml` publishes `main` automatically and also supports manual dispatch.
+- Current production URL is `https://oosaka0123-sudo.github.io/50plus/`.
+- Production pages are indexable and must not contain preview-only `noindex,nofollow`.
+- `robots.txt`, `sitemap.xml`, canonical and Open Graph URLs must match the current production URL.
+- A future custom domain such as `https://50plus.rss7.net` is optional and can be migrated deliberately later without changing the hosting provider.
+- Do not mark a release complete merely because a merge exists; require actual Pages deployment evidence and live production verification.
 
-### Temporary preview during activation / ongoing review
+### Temporary preview / ongoing review
 
-- Until dedicated Pages and the custom domain are fully activated, the `oosaka0123-sudo/ai-agent` Pages bridge may continue publishing the latest public `50plus/main` to `https://oosaka0123-sudo.github.io/ai-agent/50plus/`.
+- The `oosaka0123-sudo/ai-agent` Pages bridge may continue publishing the latest public `50plus/main` to `https://oosaka0123-sudo.github.io/ai-agent/50plus/` while still useful for preview workflows.
 - The bridge is preview-only, uses `noindex,nofollow`, and does not become another source of truth.
 - Continue using PR checks and Browser QA for development quality evidence.
 
 ### Lolipop fallback
 
-- Preserve existing manual-only Lolipop preflight/deploy workflows for recovery or deliberate future fallback.
+- Preserve existing manual-only Lolipop preflight/deploy workflows for recovery or deliberate fallback.
 - Do not require Lolipop secrets for normal development or GitHub Pages production.
 - Do not use destructive `mirror --delete` unless separately reviewed and explicitly approved.
 
@@ -206,6 +208,6 @@ The repository-side production foundation is complete when:
 - no fabricated live listing facts are presented as real
 - static files and factual data changes are reviewable via PR
 - dedicated GitHub Pages production workflow builds an indexable artifact including SEO files
-- production canonical / OG metadata remains on `https://50plus.rss7.net`
+- production canonical / OG / robots / sitemap URLs match `https://oosaka0123-sudo.github.io/50plus/`
 
-Production activation is complete only after dedicated GitHub Pages is enabled, custom-domain/DNS configuration is complete, the Pages workflow succeeds, and `https://50plus.rss7.net` is live-verified.
+Production activation is complete when dedicated GitHub Pages is enabled, the Pages workflow succeeds, and the standard GitHub Pages production URL is live-verified. A custom domain is optional follow-up work, not a production blocker.
