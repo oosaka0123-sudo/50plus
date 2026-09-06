@@ -15,17 +15,17 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Validate secrets and test FTPS login only
+      - name: Validate config and test FTPS login only
         env:
-          FTP_SERVER: ${{ secrets.LOLIPOP_FTP_SERVER }}
+          FTP_SERVER: ${{ vars.LOLIPOP_FTP_SERVER }}
+          FTP_SERVER_DIR: ${{ vars.LOLIPOP_FTP_SERVER_DIR }}
           FTP_USERNAME: ${{ secrets.LOLIPOP_FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.LOLIPOP_FTP_PASSWORD }}
-          FTP_SERVER_DIR: ${{ secrets.LOLIPOP_FTP_SERVER_DIR }}
         run: |
           missing=0
-          for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD FTP_SERVER_DIR; do
+          for name in FTP_SERVER FTP_SERVER_DIR FTP_USERNAME FTP_PASSWORD; do
             if [ -z "${!name}" ]; then
-              echo "::error::Required Lolipop FTP secret is missing (${name})."
+              echo "::error::Required Lolipop FTP configuration is missing (${name})."
               missing=1
             fi
           done
@@ -35,6 +35,13 @@ jobs:
             echo "::error::Configured FTPS host is not ftp.lolipop.jp."
             exit 1
           fi
+
+          case "$FTP_SERVER_DIR" in
+            /|""|.)
+              echo "::error::Configured FTP server directory is unsafe."
+              exit 1
+              ;;
+          esac
 
           lftp <<LFTP_EOF
           set cmd:fail-exit true
