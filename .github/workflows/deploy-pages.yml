@@ -1,11 +1,8 @@
-name: Deploy dedicated 50PLUS GitHub Pages (manual only)
-
-# The active development preview is currently published through the already-enabled
-# oosaka0123-sudo/ai-agent Pages site at /ai-agent/50plus/.
-# Keep this workflow for a future dedicated 50PLUS Pages site, but do not create a
-# known-failing run on every main update while repository Pages remains disabled.
+name: Deploy 50PLUS GitHub Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -14,40 +11,85 @@ permissions:
   id-token: write
 
 concurrency:
-  group: github-pages-preview
+  group: github-pages-production
   cancel-in-progress: true
 
 jobs:
+  pages-status:
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.status.outputs.enabled }}
+    steps:
+      - name: Detect dedicated Pages enablement
+        id: status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          code="$(curl --silent --show-error --output /tmp/pages.json --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages")"
+
+          if [[ "$code" == "200" ]]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "Dedicated GitHub Pages is enabled."
+          elif [[ "$code" == "404" ]]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Dedicated GitHub Pages is not enabled yet; deployment will be skipped safely."
+          else
+            echo "Unexpected GitHub Pages API status: $code"
+            cat /tmp/pages.json
+            exit 1
+          fi
+
   build:
+    needs: pages-status
+    if: needs.pages-status.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build preview artifact
+      - name: Verify generated listings are current
+        run: python3 scripts/render_listings.py --check
+
+      - name: Build production artifact
         run: |
           set -euo pipefail
           rm -rf _site
           mkdir -p _site
           cp index.html activities.html listings.html guides.html about.html contact.html 404.html _site/
+          cp robots.txt sitemap.xml _site/
           cp -R assets _site/assets
           touch _site/.nojekyll
 
           python3 - <<'PY'
           from pathlib import Path
 
-          marker = '<meta name="viewport" content="width=device-width, initial-scale=1">'
-          robots = '<meta name="robots" content="noindex,nofollow">'
+          expected_origin = 'https://50plus.rss7.net'
+          errors = []
 
           for path in sorted(Path('_site').glob('*.html')):
               text = path.read_text(encoding='utf-8')
-              if robots not in text:
-                  if marker not in text:
-                      raise SystemExit(f'missing viewport marker in {path}')
-                  text = text.replace(marker, marker + '\n  ' + robots, 1)
-                  path.write_text(text, encoding='utf-8')
+              if 'noindex,nofollow' in text.replace(' ', '').lower():
+                  errors.append(f'{path}: staging noindex,nofollow must not ship to production')
+              if path.name != '404.html' and expected_origin not in text:
+                  errors.append(f'{path}: expected production canonical/OG origin is missing')
 
-          print('Prepared GitHub Pages preview with noindex,nofollow on all HTML pages.')
+          robots = Path('_site/robots.txt').read_text(encoding='utf-8')
+          sitemap = Path('_site/sitemap.xml').read_text(encoding='utf-8')
+          if f'Sitemap: {expected_origin}/sitemap.xml' not in robots:
+              errors.append('robots.txt: production sitemap URL is missing')
+          if expected_origin not in sitemap:
+              errors.append('sitemap.xml: production origin is missing')
+
+          if errors:
+              raise SystemExit('\n'.join(errors))
+
+          print('Prepared indexable 50PLUS GitHub Pages production artifact.')
           PY
 
       - name: Configure GitHub Pages
@@ -59,11 +101,12 @@ jobs:
           path: _site
 
   deploy:
+    if: needs.pages-status.outputs.enabled == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [pages-status, build]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
