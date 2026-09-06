@@ -38,18 +38,17 @@ The repository-side MVP foundation is in place:
 
 ## Publishing decision
 
-The user has decided to use **dedicated GitHub Pages as the primary production host** while keeping the intended production URL `https://50plus.rss7.net`.
+The user has decided to use **dedicated GitHub Pages as the production host and the standard GitHub Pages URL as the current production URL**.
 
-### Dedicated GitHub Pages production host
+### Current production
 
-- Intended production URL: `https://50plus.rss7.net`
-- Current live dedicated Pages URL: `https://oosaka0123-sudo.github.io/50plus/`
+- Production URL: `https://oosaka0123-sudo.github.io/50plus/`
 - Production host: dedicated GitHub Pages for `oosaka0123-sudo/50plus`
 - Source of truth: current `oosaka0123-sudo/50plus` `main`
 - Production workflow: `.github/workflows/deploy-pages.yml`
 - Production artifact is indexable and does not contain preview-only `noindex,nofollow`
-- `robots.txt`, `sitemap.xml`, canonical URLs and `og:url` already target `https://50plus.rss7.net`
-- Lolipop is no longer the normal production host for this project
+- canonical URLs, `og:url`, `robots.txt` and `sitemap.xml` must match the current GitHub Pages production URL
+- Lolipop is not the normal production host for this project
 
 ### Dedicated Pages activation evidence
 
@@ -57,14 +56,19 @@ Observed on 2026-09-06 JST:
 
 - Repository `Settings -> Pages` is authenticated and accessible.
 - Pages publishing `Source` is **GitHub Actions**.
-- A fresh `Deploy 50PLUS GitHub Pages` run executed after source activation.
-- `pages_status` completed successfully.
-- production `build` completed successfully, including generated-listing verification, production artifact build, Pages configuration and artifact upload.
-- `deploy` completed successfully with `actions/deploy-pages` reporting success.
+- production workflow build and deploy have completed successfully.
 - GitHub reported the environment URL as `https://oosaka0123-sudo.github.io/50plus/`.
 - Browser-level live verification confirmed that URL renders the 50PLUS home page and navigation.
 
-This means the dedicated GitHub Pages host itself is active and operational.
+Dedicated GitHub Pages is active and operational.
+
+### Optional future custom domain
+
+`https://50plus.rss7.net` may be attached later as an optional custom domain while keeping GitHub Pages as the host. It is not a blocker for current production.
+
+If the user explicitly chooses that migration later, treat it as a deliberate URL migration: configure GitHub Pages custom domain + DNS, update canonical/OG/robots/sitemap URLs in the same reviewed change, verify HTTPS, and live-verify the custom domain before calling that migration complete.
+
+Do not change unrelated `rss7.net` DNS records.
 
 ### Temporary preview bridge
 
@@ -72,37 +76,9 @@ This means the dedicated GitHub Pages host itself is active and operational.
 - Preview host: existing `ai-agent` GitHub Pages bridge
 - Preview source: current public `50plus/main`
 - Preview remains `noindex,nofollow`
-- Preview can remain temporarily until the custom-domain cutover is complete, then may be retired if no longer needed
-
-### Remaining custom-domain cutover
-
-The only publishing cutover still incomplete is the intended custom domain.
-
-Required final steps:
-
-1. configure GitHub Pages custom domain as `50plus.rss7.net`
-2. configure authoritative DNS with `CNAME` host `50plus` -> `oosaka0123-sudo.github.io`
-3. wait for DNS propagation / GitHub DNS verification
-4. enable or confirm GitHub Pages HTTPS enforcement for the custom domain
-5. live-verify `https://50plus.rss7.net/`
-6. live-verify `robots.txt`, `sitemap.xml`, canonical URLs and normal page navigation on the custom domain
-7. only then report the custom-domain production cutover complete
-
-Do not claim the custom-domain cutover is complete until those steps are observed.
+- Preview is not another source of truth and may be retired later if no longer useful
 
 ## Current incomplete handoff
-
-### Custom-domain / DNS / HTTPS verification
-
-Dedicated GitHub Pages is already live at the default GitHub Pages URL. Remaining work is limited to connecting and validating `50plus.rss7.net`.
-
-Current known target DNS record:
-
-- Type: `CNAME`
-- Host / subdomain: `50plus`
-- Target: `oosaka0123-sudo.github.io`
-
-Do not change unrelated `rss7.net` DNS records.
 
 ### Claude authentication
 
@@ -131,7 +107,7 @@ After reconciliation:
 - continue ordinary development through Issue -> Branch -> checks -> PR -> Merge
 - treat this 50PLUS repository as the sole source of truth
 - use Browser QA as repository-native rendered evidence
-- use the dedicated Pages URL for current live production-host verification while the custom domain is being connected
+- use `https://oosaka0123-sudo.github.io/50plus/` for current live production verification
 - use the `ai-agent` URL only as the temporary noindex preview bridge
 - use the repository-local Pages workflow as the normal production publishing path
 - keep Lolipop workflows only as manual fallback; do not request Lolipop secrets for routine publishing
