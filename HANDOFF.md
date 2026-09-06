@@ -1,6 +1,6 @@
 # 50PLUS — HANDOFF
 
-Updated: 2026-09-05 JST
+Updated: 2026-09-06 JST
 
 ## Purpose
 
@@ -38,37 +38,44 @@ The repository-side MVP foundation is in place:
 
 ## Publishing decision
 
-The user has set a two-stage publishing plan.
+The user has decided to use **dedicated GitHub Pages as the primary production host** while keeping the production URL `https://50plus.rss7.net`.
 
-### Stage A — now / during development
+### Primary production
 
-- Active public preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
-- Preview host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
+- Production URL: `https://50plus.rss7.net`
+- Production host: dedicated GitHub Pages for `oosaka0123-sudo/50plus`
 - Source of truth: current `oosaka0123-sudo/50plus` `main`
-- The ai-agent Pages build clones current public 50PLUS `main` read-only and generates only the runtime preview copy under its Pages artifact
-- copied 50PLUS files are not committed into `ai-agent`
-- all seven generated preview HTML pages are required to contain `noindex,nofollow`
-- the bridge refreshes periodically from current 50PLUS `main`
-- dedicated Pages for the `50plus` repository remains disabled; its local Pages workflow is retained as manual-only and is not the normal preview path
-- Lolipop configuration is **not** a blocker during this stage
+- Production workflow: `.github/workflows/deploy-pages.yml`
+- Production must be indexable and must not contain preview-only `noindex,nofollow`
+- `robots.txt` and `sitemap.xml` are production artifacts
+- Lolipop is no longer the normal production host
 
-The bridge has been successfully deployed by the already-enabled ai-agent Pages workflow from both a review branch and merged ai-agent `main`, including seven HTML pages, CSS/JS validation, noindex verification, Pages artifact upload and deploy-pages success.
+### Temporary preview while activation is incomplete
 
-### Stage B — after completion
+- Preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+- Preview host: existing `ai-agent` GitHub Pages bridge
+- Preview source: current public `50plus/main`
+- Preview remains `noindex,nofollow`
+- Preview evidence must not be reported as production evidence
 
-- Final production URL: `https://50plus.rss7.net`
-- Final hosting: Lolipop
-- Migration is performed only after the user explicitly considers 50PLUS complete and moves it to final production
-- Existing manual Lolipop deployment/preflight paths are retained for that future stage
-- retire the temporary ai-agent Pages bridge after successful final production unless the user explicitly wants to keep it
+### Human-owned activation still required
 
-Do not prematurely switch the project back to Lolipop during normal development.
+Repository changes cannot finish these one-time settings:
+
+1. enable dedicated GitHub Pages for `oosaka0123-sudo/50plus` with GitHub Actions as the source
+2. configure custom domain `50plus.rss7.net`
+3. configure DNS CNAME for `50plus` to `oosaka0123-sudo.github.io`
+4. complete GitHub custom-domain/DNS verification and HTTPS enablement
+5. require successful `Deploy 50PLUS GitHub Pages`
+6. live-verify the custom domain and SEO files
+
+Until these are observed, do not claim final production activation is complete.
 
 ## Current incomplete handoff
 
-### Browser-level preview observation
+### Dedicated Pages activation / live verification
 
-GitHub Actions deployment evidence for the active bridge is verified. If a task specifically requires browser-level live verification of a newly refreshed preview, distinguish that from Actions deployment evidence and use an available browser/web path rather than inventing visual confirmation.
+Repository-side production workflow and documentation may be prepared through Issue/Branch/PR, but dedicated Pages activation and DNS remain human/account-owned boundaries. Once activated, confirm the actual workflow run and live custom-domain behavior.
 
 ### Claude authentication
 
@@ -86,29 +93,21 @@ That task is explicitly **ANALYSIS ONLY**:
 - no Branch / Commit / Pull Request should be created
 - Claude should return only the requested analysis in the Issue conversation
 
+### Google Media MCP
+
+A current blocker Issue tracks the Claude Code environment egress/client-token requirements for the existing Google Media MCP connection. Do not recreate the Cloud Run/Vertex infrastructure unless a later verified preflight proves a server-side blocker.
+
 ## Current development rule
 
 After reconciliation:
 
-- continue ordinary development through Issue → Branch → checks → PR → Merge
-- use `https://oosaka0123-sudo.github.io/ai-agent/50plus/` as the active development preview
-- treat this 50PLUS repository as the sole source of truth; do not edit generated preview copies elsewhere
+- continue ordinary development through Issue -> Branch -> checks -> PR -> Merge
+- treat this 50PLUS repository as the sole source of truth
 - use Browser QA as repository-native rendered evidence
+- use the `ai-agent` URL only as the temporary noindex preview while dedicated Pages activation is incomplete
+- once dedicated Pages is enabled, use the repository-local Pages workflow as the normal production publishing path
+- keep Lolipop workflows only as manual fallback; do not request Lolipop secrets for routine publishing
 - if Claude authentication becomes available, verify the analysis-only Claude task according to its current Issue
-- do not request Lolipop secrets or trigger Lolipop deploy merely to continue development
-
-## Future final migration rule
-
-Only when the user explicitly says the site is complete / ready for final production:
-
-1. confirm intended final `main`
-2. require current PR/static checks and Browser QA evidence
-3. human verifies the dedicated `50plus.rss7.net` Lolipop directory
-4. human configures required Lolipop repository secrets
-5. run Lolipop preflight
-6. perform deliberate manual Lolipop deployment
-7. verify final domain pages, SEO files and 404 behavior
-8. retire the temporary ai-agent Pages bridge unless explicitly retained
 
 ## Do not store here
 
