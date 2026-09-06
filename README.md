@@ -6,22 +6,27 @@
 
 ## Publishing targets
 
-### Current development preview
+### Production
 
-- Active preview: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
-- Host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
-- Source of truth remains this repository: `oosaka0123-sudo/50plus` `main`
-- The bridge reads current public `50plus/main` during the Pages build and publishes only runtime files under `/ai-agent/50plus/`.
-- Preview HTML is generated with `noindex,nofollow`; copied preview files are not committed back into `ai-agent`.
-- The bridge refreshes automatically on its Pages schedule, so normal 50PLUS development does not require enabling Pages in this repository.
+- Production URL: `https://50plus.rss7.net`
+- Primary hosting: dedicated GitHub Pages for `oosaka0123-sudo/50plus`
+- Source of truth: this repository `main`
+- `.github/workflows/deploy-pages.yml` publishes the static production artifact after approved changes reach `main`.
+- Production HTML is indexable; the staging-only `noindex,nofollow` injection is not used in the dedicated production artifact.
+- `robots.txt` and `sitemap.xml` are included in the Pages artifact and continue to use `https://50plus.rss7.net`.
+- GitHub Pages repository enablement and the custom-domain/DNS setup are one-time human-owned activation steps.
 
-### Final production target
+### Temporary preview bridge
 
-- Planned final URL: `https://50plus.rss7.net`
-- Final hosting: Lolipop
-- Migration to Lolipop happens **after the site is considered complete and the user explicitly moves to final production**.
+Until dedicated 50PLUS Pages and the custom domain are fully activated and verified, the existing preview remains available at:
 
-The GitHub Pages bridge is therefore a temporary public development/preview environment, not a replacement for the final Lolipop production target.
+- `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+
+The `ai-agent` bridge is preview-only and injects `noindex,nofollow`. It must not be treated as the production URL or as another source of truth.
+
+### Lolipop fallback
+
+The existing manual Lolipop deployment/preflight path is retained as an emergency/future fallback only. Lolipop is no longer the normal production target and its secrets are not required for standard GitHub Pages publishing.
 
 ## Repository
 
@@ -38,11 +43,11 @@ Remote-first development:
 3. Implementation and test
 4. Pull Request / review
 5. Merge to `main`
-6. The existing `ai-agent` Pages bridge reads the latest 50PLUS `main` and refreshes the public preview
-7. Continue development and QA on the preview until completion
-8. After completion, perform the deliberate final migration to Lolipop and verify `https://50plus.rss7.net`
+6. PR/static checks and Browser QA remain the evidence for code/UI quality
+7. Once dedicated Pages is enabled, `Deploy 50PLUS GitHub Pages` publishes approved `main` automatically
+8. Verify the production deployment and `https://50plus.rss7.net`
 
-The repository-local `.github/workflows/deploy-pages.yml` is manual-only while dedicated 50PLUS Pages remains disabled; it is not the active automatic preview path.
+Before dedicated Pages activation is complete, continue using the existing `ai-agent` noindex preview bridge for visual review.
 
 ## Initial Product Scope
 

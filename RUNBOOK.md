@@ -4,39 +4,20 @@
 
 This file is the operational handoff for one-time setup and repeatable remote operation. GitHub is the SSOT; do not rely on chat memory when this file and current repository state are available.
 
-## Publishing stages
+## Publishing architecture
 
-### Current development preview
+### Primary production — dedicated GitHub Pages
 
 - Source repository / SSOT: `oosaka0123-sudo/50plus`
-- Active preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
-- Preview host: the already-enabled GitHub Pages site of `oosaka0123-sudo/ai-agent`
-- Preview source: current public `oosaka0123-sudo/50plus` `main`
-- Search policy: generated preview HTML is deployed with `noindex,nofollow`
+- Production URL: `https://50plus.rss7.net`
+- Production host: dedicated GitHub Pages for this repository
+- Production workflow: `.github/workflows/deploy-pages.yml`
+- Source revision: approved `main`
+- Search policy: production is indexable; preview-only `noindex,nofollow` must not ship
 
-The ai-agent Pages workflow is a **temporary publishing bridge only**. It reads 50PLUS `main` during the Actions run, generates the runtime preview under the Pages artifact, and does not commit copied 50PLUS website files into ai-agent.
+The production workflow is designed to run on every `main` push and by manual dispatch once repository Pages is enabled. Before Pages is enabled, it safely detects the disabled state and skips build/deploy instead of producing a known-failing deployment.
 
-The repository-local `.github/workflows/deploy-pages.yml` is manual-only while dedicated Pages for `oosaka0123-sudo/50plus` remains disabled. Do not trigger it during normal development merely to refresh the active preview.
-
-### Final production target
-
-- Final URL: `https://50plus.rss7.net`
-- Final hosting: Lolipop
-- Migration timing: only after the user considers the site complete and explicitly moves to final production
-
-Lolipop configuration is **not** a blocker for current development. Do not trigger the Lolipop workflow or request Lolipop secrets during the GitHub Pages development stage.
-
-## Active GitHub Pages preview bridge
-
-### Source of truth
-
-All product code, HTML, CSS, JavaScript, listing data and project rules remain in `oosaka0123-sudo/50plus`.
-
-The bridge lives in the existing `oosaka0123-sudo/ai-agent` Pages workflow and performs a read-only clone of current public `50plus/main` during deployment. The generated preview copy is ephemeral and exists only in the Pages build workspace/artifact.
-
-### Published runtime files
-
-The bridge publishes under `/ai-agent/50plus/`:
+The production artifact contains:
 - `index.html`
 - `activities.html`
 - `listings.html`
@@ -45,39 +26,67 @@ The bridge publishes under `/ai-agent/50plus/`:
 - `contact.html`
 - `404.html`
 - `assets/`
+- `robots.txt`
+- `sitemap.xml`
+- `.nojekyll`
 
-It verifies that all seven HTML files exist and that `assets/styles.css` and `assets/main.js` exist before deployment.
+Before upload, the workflow verifies:
+1. generated Listings HTML matches canonical JSON
+2. production HTML does not contain preview-only `noindex,nofollow`
+3. primary HTML carries the expected `https://50plus.rss7.net` production origin
+4. `robots.txt` references the production sitemap
+5. `sitemap.xml` contains the production origin
 
-### Search protection
+### One-time GitHub Pages activation
 
-The bridge injects this into every generated preview HTML page:
+Repository files alone cannot complete these account/DNS operations.
 
-`<meta name="robots" content="noindex,nofollow">`
+Human-owned activation steps:
+1. Repository `Settings` -> `Pages`.
+2. Set the publishing source to **GitHub Actions** / enable dedicated Pages for the repository.
+3. Set custom domain to `50plus.rss7.net`.
+4. At the DNS provider for `rss7.net`, configure subdomain `50plus` as a CNAME to `oosaka0123-sudo.github.io` according to GitHub Pages custom-domain guidance.
+5. Wait for GitHub custom-domain/DNS verification.
+6. Enable HTTPS when GitHub makes the option available.
+7. Run or allow `Deploy 50PLUS GitHub Pages` to run and require success.
+8. Live-verify `https://50plus.rss7.net/`, all primary pages, `robots.txt`, `sitemap.xml`, and 404 behavior.
 
-The injection is verified during the Actions run. Do not add this staging-only tag permanently to the 50PLUS source HTML; source canonical/OG metadata remains prepared for the final Lolipop domain.
+Do not add a repository `CNAME` file merely to compensate for a custom Actions deployment; the domain is configured in Pages settings/DNS.
 
-### Refresh behavior
+### Temporary preview bridge
 
-The bridge is scheduled from `ai-agent` and refreshes periodically by reading the latest 50PLUS `main`. A normal 50PLUS merge therefore does not need direct Pages enablement in this repository.
+Until dedicated Pages and the custom domain are fully active, the existing `oosaka0123-sudo/ai-agent` GitHub Pages site remains a temporary preview bridge:
 
-If an immediate preview refresh is needed, use the current ai-agent Pages workflow according to that repository's rules rather than changing the 50PLUS source-of-truth boundary.
+- Preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
+- Source: current public `oosaka0123-sudo/50plus` `main`
+- Search policy: generated preview HTML receives `noindex,nofollow`
 
-### Verification rule
+The bridge is a publishing mechanism only. It does not become another source of truth, and preview deployment evidence must not be reported as production deployment evidence.
 
-Do not claim a newly changed preview is refreshed merely because 50PLUS was merged. Check the relevant ai-agent Pages run and require:
-1. current 50PLUS `main` clone succeeds
-2. seven HTML pages/assets validation succeeds
-3. `noindex,nofollow` verification succeeds
-4. Pages artifact upload succeeds
-5. `deploy-pages` succeeds
+### Lolipop fallback
 
-The bridge mechanism has been successfully executed from both its review branch and ai-agent `main`. Browser-level live rendering should still be distinguished from Actions deployment evidence when no browser observation is available.
+Existing workflows:
+- `.github/workflows/deploy-preflight.yml`
+- `.github/workflows/deploy-lolipop.yml`
 
-## Dedicated 50PLUS Pages workflow — dormant/manual
+These are retained as manual emergency/future fallback paths only. They are not the normal production route.
 
-`.github/workflows/deploy-pages.yml` is retained as a possible future dedicated Pages path but is **manual-only** while repository Pages remains disabled.
+Do not request or configure Lolipop secrets for ordinary development or GitHub Pages production. Never enable destructive `mirror --delete` without a separately reviewed recovery/migration plan and explicit approval.
 
-Do not re-enable automatic `main` push deployment here unless dedicated 50PLUS Pages is actually enabled and a successful deployment is verified. The active development preview does not depend on this workflow.
+## Production deployment verification
+
+For a production release, require:
+1. intended changes are merged to `main`
+2. relevant PR/static checks passed
+3. Browser QA evidence is current when UI behavior/layout changed
+4. dedicated Pages is enabled
+5. `Deploy 50PLUS GitHub Pages` build succeeds
+6. Pages artifact upload succeeds
+7. `deploy-pages` succeeds
+8. GitHub reports the expected deployment URL/custom domain
+9. browser/live HTTP verification confirms the custom domain and SEO files
+
+Do not claim production complete from a merge alone.
 
 ## Claude Code Issue automation
 
@@ -107,7 +116,7 @@ Never write either secret value into Issues, PRs, commits, README, RUNBOOK, logs
 
 ### Human setup path in GitHub
 
-Repository → Settings → Secrets and variables → Actions → New repository secret
+Repository -> Settings -> Secrets and variables -> Actions -> New repository secret
 
 After authentication is configured:
 1. Open the target GitHub Issue.
@@ -128,7 +137,7 @@ After authentication is configured:
 Purpose:
 - provide repeatable rendered desktop/mobile evidence without requiring a local browser
 - test checked-out repository files through a local HTTP server on the GitHub Actions runner
-- never depend on either the GitHub Pages preview or the Lolipop production URL
+- never depend on either the preview or production URL
 
 Current coverage:
 - HOME
@@ -157,47 +166,6 @@ For UI-affecting PRs:
 1. Wait for both `PR checks` and `Browser QA`.
 2. Require both to pass before merge.
 3. Review screenshots when layout/navigation/typography/spacing/interaction can change.
-
-## Final Lolipop migration — future stage only
-
-### Existing workflows
-
-- `.github/workflows/deploy-preflight.yml`
-- `.github/workflows/deploy-lolipop.yml`
-
-These are preserved for the **final production migration after completion**. They are not part of the current GitHub Pages preview flow.
-
-Current safety characteristics:
-- manual-only
-- no automatic Lolipop deployment from `main`
-- no `mirror --delete`
-- repository/dev files excluded from upload
-- root/empty remote directory rejected
-
-### Required future repository secrets
-
-At final migration only, the existing Lolipop workflow expects:
-- `LOLIPOP_FTP_SERVER`
-- `LOLIPOP_FTP_USERNAME`
-- `LOLIPOP_FTP_PASSWORD`
-- `LOLIPOP_FTP_SERVER_DIR`
-
-Never store their values in repository files or chat.
-
-### Final migration prerequisites
-
-Before final Lolipop deployment:
-1. User explicitly confirms 50PLUS is ready for final production migration.
-2. Confirm `main` is the intended final release.
-3. Re-run/confirm PR checks and Browser QA evidence.
-4. Human verifies the `50plus.rss7.net` subdomain and its dedicated Lolipop directory.
-5. Human configures the four Lolipop repository secrets.
-6. Run the Lolipop preflight and require success.
-7. Run the manual Lolipop deploy.
-8. Verify `https://50plus.rss7.net/`, all primary pages, `robots.txt`, `sitemap.xml` and 404 behavior.
-9. Confirm final SEO behavior and retire the temporary ai-agent Pages bridge unless explicitly retained.
-
-Do not mark final production complete until live verification succeeds.
 
 ## Verified listings maintenance
 
@@ -235,7 +203,7 @@ Never fabricate live venue/event facts, schedules, prices, ratings, participant 
 ## Operational rule
 
 For implementation tasks prefer:
-Issue → Active Owner → Branch → Implementation → Test → PR → Review → Merge.
+Issue -> Active Owner -> Branch -> Implementation -> Test -> PR -> Review -> Merge.
 
 For analysis-only tasks, follow the Issue's requested output without repository mutations.
 
