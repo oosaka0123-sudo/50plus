@@ -50,21 +50,21 @@ When the user says `このチャット内容をリポジトリに保存して` o
 
 ### Production path
 
-Production URL: `https://50plus.rss7.net`
+Production URL: `https://oosaka0123-sudo.github.io/50plus/`
 
 Primary production hosting is dedicated GitHub Pages for `oosaka0123-sudo/50plus`.
 
 - this repository remains the sole code/content SSOT
 - approved changes reach production from `main` through `.github/workflows/deploy-pages.yml`
 - the production Pages artifact must include the seven public HTML pages, `assets/`, `robots.txt` and `sitemap.xml`
-- production HTML must not contain the preview-only `noindex,nofollow` injection
-- canonical and Open Graph URLs remain on `https://50plus.rss7.net`
-- repository Pages enablement plus custom-domain/DNS configuration are one-time human-owned activation steps
-- never claim production complete until the dedicated Pages deployment and live custom-domain verification are observed
+- production HTML must not contain preview-only `noindex,nofollow`
+- canonical, Open Graph, robots and sitemap URLs use the live GitHub Pages production URL
+- `https://50plus.rss7.net` is an optional future custom domain and is not a blocker for current production
+- never claim a release complete from merge alone; require successful Pages deployment and live verification of the current production URL
 
-### Preview bridge during activation/development
+### Preview bridge
 
-Until dedicated Pages is fully activated and verified, the existing `oosaka0123-sudo/ai-agent` Pages site remains a temporary preview bridge at `https://oosaka0123-sudo.github.io/ai-agent/50plus/`.
+The existing `oosaka0123-sudo/ai-agent` Pages site may remain as a temporary preview bridge at `https://oosaka0123-sudo.github.io/ai-agent/50plus/`.
 
 The bridge reads the current public `50plus/main`, generates runtime preview files only, injects `noindex,nofollow`, and does not become another source of truth. Do not confuse preview deployment evidence with production deployment evidence.
 
@@ -73,7 +73,7 @@ The bridge reads the current public `50plus/main`, generates runtime preview fil
 The existing Lolipop preflight/deploy workflows are retained as a manual fallback only. They are not the normal production path.
 
 - do not request or modify Lolipop secrets for ordinary development or GitHub Pages production
-- do not trigger Lolipop deployment merely because GitHub Pages activation is pending
+- do not trigger Lolipop deployment merely because a custom domain is not configured
 - never enable destructive mirror/delete behavior without an explicit reviewed migration or recovery plan
 
 ## Handoff

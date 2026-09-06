@@ -10,17 +10,19 @@ Before making changes:
 
 Current product: 50PLUS, an adult friendship / community information website.
 
-Production URL: `https://50plus.rss7.net`
+Production URL: `https://oosaka0123-sudo.github.io/50plus/`
 
 Primary production publishing: dedicated GitHub Pages for `oosaka0123-sudo/50plus`, using `.github/workflows/deploy-pages.yml` from approved `main`.
 
-Temporary preview while dedicated Pages/custom-domain activation is incomplete: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`. The `ai-agent` bridge is preview-only, injects `noindex,nofollow`, and is not another source of truth.
+Optional future custom domain: `https://50plus.rss7.net`. It is not required for current production and must not be treated as a blocker. If adopted later, migrate DNS and canonical/OG/robots/sitemap URLs together in one reviewed change.
+
+Temporary preview bridge: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`. The `ai-agent` bridge is preview-only, injects `noindex,nofollow`, and is not another source of truth.
 
 Development is remote-first via GitHub and Claude Code on the web. Use Issue/Branch/PR flow unless a project rule explicitly permits otherwise.
 
 Do not treat Lolipop as the normal production path. Existing Lolipop workflows are manual fallback only. Do not request or modify Lolipop secrets merely to continue development or GitHub Pages production.
 
-Do not claim production complete until dedicated Pages is enabled, the production workflow succeeds, the custom domain/DNS is configured, and `https://50plus.rss7.net` is live-verified.
+Do not claim a production release complete until the relevant checks pass, the dedicated Pages workflow succeeds, and the current GitHub Pages production URL is live-verified.
 
 ## Google Media MCP — fast connection path
 

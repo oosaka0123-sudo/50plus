@@ -8,17 +8,17 @@
 
 ### Production
 
-- Production URL: `https://50plus.rss7.net`
+- Production URL: `https://oosaka0123-sudo.github.io/50plus/`
 - Primary hosting: dedicated GitHub Pages for `oosaka0123-sudo/50plus`
 - Source of truth: this repository `main`
 - `.github/workflows/deploy-pages.yml` publishes the static production artifact after approved changes reach `main`.
-- Production HTML is indexable; the staging-only `noindex,nofollow` injection is not used in the dedicated production artifact.
-- `robots.txt` and `sitemap.xml` are included in the Pages artifact and continue to use `https://50plus.rss7.net`.
-- GitHub Pages repository enablement and the custom-domain/DNS setup are one-time human-owned activation steps.
+- Production HTML is indexable; preview-only `noindex,nofollow` is not used in the dedicated production artifact.
+- `robots.txt`, `sitemap.xml`, canonical URLs and Open Graph URLs use the current GitHub Pages production URL.
+- `https://50plus.rss7.net` may be attached later as an optional GitHub Pages custom domain; it is not required for current production.
 
 ### Temporary preview bridge
 
-Until dedicated 50PLUS Pages and the custom domain are fully activated and verified, the existing preview remains available at:
+The older preview bridge may remain available temporarily at:
 
 - `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
 
@@ -26,7 +26,7 @@ The `ai-agent` bridge is preview-only and injects `noindex,nofollow`. It must no
 
 ### Lolipop fallback
 
-The existing manual Lolipop deployment/preflight path is retained as an emergency/future fallback only. Lolipop is no longer the normal production target and its secrets are not required for standard GitHub Pages publishing.
+The existing manual Lolipop deployment/preflight path is retained as an emergency fallback only. Lolipop is not the normal production target and its secrets are not required for standard GitHub Pages publishing.
 
 ## Repository
 
@@ -44,10 +44,8 @@ Remote-first development:
 4. Pull Request / review
 5. Merge to `main`
 6. PR/static checks and Browser QA remain the evidence for code/UI quality
-7. Once dedicated Pages is enabled, `Deploy 50PLUS GitHub Pages` publishes approved `main` automatically
-8. Verify the production deployment and `https://50plus.rss7.net`
-
-Before dedicated Pages activation is complete, continue using the existing `ai-agent` noindex preview bridge for visual review.
+7. `Deploy 50PLUS GitHub Pages` publishes approved `main` automatically
+8. Verify the production deployment at `https://oosaka0123-sudo.github.io/50plus/`
 
 ## Initial Product Scope
 
