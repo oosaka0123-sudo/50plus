@@ -9,13 +9,13 @@ This file is the operational handoff for one-time setup and repeatable remote op
 ### Primary production — dedicated GitHub Pages
 
 - Source repository / SSOT: `oosaka0123-sudo/50plus`
-- Production URL: `https://50plus.rss7.net`
+- Production URL: `https://oosaka0123-sudo.github.io/50plus/`
 - Production host: dedicated GitHub Pages for this repository
 - Production workflow: `.github/workflows/deploy-pages.yml`
 - Source revision: approved `main`
 - Search policy: production is indexable; preview-only `noindex,nofollow` must not ship
 
-The production workflow is designed to run on every `main` push and by manual dispatch once repository Pages is enabled. Before Pages is enabled, it safely detects the disabled state and skips build/deploy instead of producing a known-failing deployment.
+The production workflow runs on every `main` push and by manual dispatch. Dedicated Pages is already enabled.
 
 The production artifact contains:
 - `index.html`
@@ -33,29 +33,28 @@ The production artifact contains:
 Before upload, the workflow verifies:
 1. generated Listings HTML matches canonical JSON
 2. production HTML does not contain preview-only `noindex,nofollow`
-3. primary HTML carries the expected `https://50plus.rss7.net` production origin
+3. primary HTML carries the expected `https://oosaka0123-sudo.github.io/50plus` production origin
 4. `robots.txt` references the production sitemap
 5. `sitemap.xml` contains the production origin
 
-### One-time GitHub Pages activation
+### Optional future custom domain
 
-Repository files alone cannot complete these account/DNS operations.
+`https://50plus.rss7.net` is not required for current GitHub Pages production. It may be added later as an optional custom domain while keeping GitHub Pages as the host.
 
-Human-owned activation steps:
+If the user explicitly chooses that migration later:
 1. Repository `Settings` -> `Pages`.
-2. Set the publishing source to **GitHub Actions** / enable dedicated Pages for the repository.
-3. Set custom domain to `50plus.rss7.net`.
-4. At the DNS provider for `rss7.net`, configure subdomain `50plus` as a CNAME to `oosaka0123-sudo.github.io` according to GitHub Pages custom-domain guidance.
-5. Wait for GitHub custom-domain/DNS verification.
-6. Enable HTTPS when GitHub makes the option available.
-7. Run or allow `Deploy 50PLUS GitHub Pages` to run and require success.
-8. Live-verify `https://50plus.rss7.net/`, all primary pages, `robots.txt`, `sitemap.xml`, and 404 behavior.
+2. Set custom domain to `50plus.rss7.net`.
+3. At the authoritative DNS provider for `rss7.net`, configure subdomain `50plus` as a CNAME to `oosaka0123-sudo.github.io`.
+4. Wait for GitHub custom-domain/DNS verification.
+5. Enable HTTPS when GitHub makes the option available.
+6. Change canonical / OG / robots / sitemap production URLs in the same reviewed migration.
+7. Live-verify the custom domain before declaring the migration complete.
 
-Do not add a repository `CNAME` file merely to compensate for a custom Actions deployment; the domain is configured in Pages settings/DNS.
+Do not change unrelated `rss7.net` DNS records. Do not add a repository `CNAME` file merely to compensate for a custom Actions deployment.
 
 ### Temporary preview bridge
 
-Until dedicated Pages and the custom domain are fully active, the existing `oosaka0123-sudo/ai-agent` GitHub Pages site remains a temporary preview bridge:
+The existing `oosaka0123-sudo/ai-agent` GitHub Pages site may remain as a temporary preview bridge:
 
 - Preview URL: `https://oosaka0123-sudo.github.io/ai-agent/50plus/`
 - Source: current public `oosaka0123-sudo/50plus` `main`
@@ -69,7 +68,7 @@ Existing workflows:
 - `.github/workflows/deploy-preflight.yml`
 - `.github/workflows/deploy-lolipop.yml`
 
-These are retained as manual emergency/future fallback paths only. They are not the normal production route.
+These are retained as manual emergency fallback paths only. They are not the normal production route.
 
 Do not request or configure Lolipop secrets for ordinary development or GitHub Pages production. Never enable destructive `mirror --delete` without a separately reviewed recovery/migration plan and explicit approval.
 
@@ -79,14 +78,13 @@ For a production release, require:
 1. intended changes are merged to `main`
 2. relevant PR/static checks passed
 3. Browser QA evidence is current when UI behavior/layout changed
-4. dedicated Pages is enabled
-5. `Deploy 50PLUS GitHub Pages` build succeeds
-6. Pages artifact upload succeeds
-7. `deploy-pages` succeeds
-8. GitHub reports the expected deployment URL/custom domain
-9. browser/live HTTP verification confirms the custom domain and SEO files
+4. `Deploy 50PLUS GitHub Pages` build succeeds
+5. Pages artifact upload succeeds
+6. `deploy-pages` succeeds
+7. GitHub reports the expected deployment URL
+8. browser/live verification confirms `https://oosaka0123-sudo.github.io/50plus/` and relevant SEO files
 
-Do not claim production complete from a merge alone.
+Do not claim a release complete from a merge alone.
 
 ## Claude Code Issue automation
 
