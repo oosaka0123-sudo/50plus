@@ -64,3 +64,13 @@ visible caption stating the media is illustrative (「写真はイメージで�
 「映像はイメージです」) and does not represent real people, groups, or
 occurrences.
 
+## Derived social preview
+
+`assets/media/social/og-50plus.jpg` is not a new AI generation. It is derived
+from the committed `hero-community-plaza-1280.webp` still for social link
+previews. The image was center-cropped and resized to 1200×630, then saved as
+a progressive JPEG at quality 85. No retouching, new factual claims, or
+additional remote media generation were involved.
+
+The file is referenced by Open Graph and Twitter/X card metadata on the
+indexable public pages.
