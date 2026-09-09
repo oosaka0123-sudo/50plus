@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-09-10",
+  "verified_at": "2026-09-09",
   "policy": "Official-source facts only. Do not infer participant demographics, gender ratio, atmosphere, popularity, ratings, or pickup likelihood.",
   "items": [
     {
@@ -82,7 +82,7 @@
       "source_urls": [
         "https://osakademanabu.com/event/"
       ],
-      "verified_at": "2026-09-10"
+      "verified_at": "2026-09-09"
     },
     {
       "id": "osaka-civic-activity-info",
@@ -94,7 +94,7 @@
       "source_urls": [
         "https://www.city.osaka.lg.jp/shimin/page/0000497908.html"
       ],
-      "verified_at": "2026-09-10"
+      "verified_at": "2026-09-09"
     },
     {
       "id": "osaka-sports-info",
@@ -106,7 +106,7 @@
       "source_urls": [
         "https://www.city.osaka.lg.jp/event/category/3030-2-0-0-0-0-0-0-0-0.html"
       ],
-      "verified_at": "2026-09-10"
+      "verified_at": "2026-09-09"
     },
     {
       "id": "osaka-library-events",
@@ -118,7 +118,7 @@
       "source_urls": [
         "https://www.oml.city.osaka.lg.jp/page/event.html"
       ],
-      "verified_at": "2026-09-10"
+      "verified_at": "2026-09-09"
     }
   ]
 }
