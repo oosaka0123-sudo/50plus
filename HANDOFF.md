@@ -1,6 +1,6 @@
 # 50PLUS — HANDOFF
 
-Updated: 2026-09-06 JST
+Updated: 2026-09-09 JST
 
 ## Purpose
 
@@ -80,25 +80,51 @@ Do not change unrelated `rss7.net` DNS records.
 
 ## Current incomplete handoff
 
-### Claude authentication
+### Active task — Issue #58
 
-Claude Issue automation still requires one supported repository authentication secret configured by the human owner before Claude can run.
+Repository: `oosaka0123-sudo/50plus`
 
-Never invent, retrieve, copy into chat, commit, log or modify secret values.
+Goal:
+- redesign 50PLUS with Claude Code as the single active implementation owner
+- use Google Media MCP-generated production assets extensively, especially a cinematic home hero video and coherent lifestyle images
+- keep the experience premium, energetic, readable, fast and mobile-first
+- retain the product boundary: respectful adult friendship/community discovery, not dating or pickup optimization
 
-### Claude independent review
+Confirmed design requirements:
+- finished media files are committed and served statically; page viewing must never wait for AI generation
+- hero video needs a still-image fallback and `prefers-reduced-motion` behavior
+- imagery should depict respectful adults around 50+ enjoying Osaka/Kansai activities such as walking, learning, culture, outdoor activity and casual community participation
+- avoid stereotypical elderly, medical, retirement-home, romance or dating-app imagery
+- preserve the seven public pages, verified-listing safeguards, canonical/SEO files and dedicated GitHub Pages architecture
+- do not fabricate venue/event facts, schedules, prices, reviews, ratings or participant demographics
 
-A current open meta-review Issue is intended for Claude after authentication is available.
+### OBSERVED
 
-That task is explicitly **ANALYSIS ONLY**:
-- repository reads are allowed
-- repository file changes are forbidden
-- no Branch / Commit / Pull Request should be created
-- Claude should return only the requested analysis in the Issue conversation
+- Issue #58 exists and assigns the visual redesign scope to Claude Code as the single active owner.
+- Current `main` at the start of this task was commit `9ebe10a`.
+- The authorized Windows development device is online and has a fresh `C:\\Users\\oosak\\50plus` clone on `main`.
+- The same device previously verified Claude Code, Google Media MCP and Steel Browser MCP end-to-end in the `ai-agent` project.
+- In the 50PLUS checkout, Claude Code discovered the Project-scoped `google-media` MCP entry but reported `Pending approval`.
+- The automated 50PLUS approval-setting command was interrupted before success could be observed. Do not assume that approval was written.
+- No 50PLUS implementation branch, media generation, source-file change, commit or PR has been completed for Issue #58 yet.
 
-### Google Media MCP
+### BLOCKER / resume point
 
-A current blocker Issue tracks the Claude Code environment egress/client-token requirements for the existing Google Media MCP connection. Do not recreate the Cloud Run/Vertex infrastructure unless a later verified preflight proves a server-side blocker.
+The only current stop point is 50PLUS Project-scoped Google Media MCP approval/recognition in Claude Code. Production Google Media infrastructure must not be recreated.
+
+Resume with:
+1. Re-read current `ai-master`, current 50PLUS `main`, Issue #58, open PRs and latest Actions.
+2. Verify the Windows device is online and the `50plus` checkout is clean/current.
+3. Finish Project-scoped `google-media` approval without exposing or persisting token values in the repository.
+4. Run `bash scripts/google_media_mcp_preflight.sh`, then confirm Claude Code reports `google-media` as connected and exposes `generate_image` / `generate_video`.
+5. Follow `CLAUDE.md`: exactly one minimal image smoke test, then exactly one minimal video smoke test.
+6. Let Claude Code create a dedicated Issue #58 branch and implement the redesign, generated assets, fallbacks and documentation.
+7. Run static checks and desktop/390px Browser QA; review performance, reduced-motion and no-horizontal-overflow behavior.
+8. Create a PR, review evidence, merge only when safe, wait for GitHub Pages deployment, and live-verify production.
+
+### Re-entry message
+
+`Read current ai-master and 50PLUS main, then read Issue #58 and HANDOFF.md. Resume at the 50PLUS google-media Project approval step and complete the Claude-first media redesign through PR, checks, Pages deploy and live verification.`
 
 ## Current development rule
 
