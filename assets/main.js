@@ -57,4 +57,40 @@
 
   const year = document.querySelector('[data-current-year]');
   if (year) year.textContent = String(new Date().getFullYear());
+
+  const heroMedia = document.querySelector('[data-hero-media]');
+  if (heroMedia) {
+    const video = heroMedia.querySelector('[data-hero-video]');
+    const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const enableStillOnly = () => {
+      heroMedia.classList.remove('hero-video-active');
+      video.pause();
+      video.removeAttribute('src');
+      video.querySelectorAll('source').forEach((source) => source.remove());
+      video.load();
+    };
+
+    const enableVideo = () => {
+      if (!video.querySelector('source')) {
+        const source = document.createElement('source');
+        source.src = video.dataset.src;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        video.load();
+      }
+      video.play().catch(() => {
+        // Autoplay was blocked; the poster/still image remains visible.
+      });
+      heroMedia.classList.add('hero-video-active');
+    };
+
+    const applyMotionPreference = (query) => {
+      if (query.matches) enableStillOnly();
+      else enableVideo();
+    };
+
+    applyMotionPreference(reduceMotionQuery);
+    reduceMotionQuery.addEventListener('change', applyMotionPreference);
+  }
 })();

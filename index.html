@@ -36,9 +36,35 @@
 </header>
 
 <main id="main">
-  <section class="hero">
+  <section class="hero hero-media-section">
+    <div class="hero-media" data-hero-media>
+      <video
+        class="hero-video"
+        data-hero-video
+        data-src="assets/media/video/hero-loop.mp4"
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster="assets/media/images/hero-community-plaza-1280.webp"
+        aria-hidden="true"
+        tabindex="-1"></video>
+      <img
+        class="hero-still"
+        data-hero-still
+        src="assets/media/images/hero-community-plaza-1280.webp"
+        srcset="assets/media/images/hero-community-plaza-640.webp 640w, assets/media/images/hero-community-plaza-1280.webp 1280w"
+        sizes="100vw"
+        width="1280"
+        height="731"
+        alt="夕暮れの大阪の広場で、笑いながら立ち話をする50代の男女5人"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async">
+      <div class="hero-media-scrim" aria-hidden="true"></div>
+    </div>
     <div class="container hero-grid">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Life gets interesting after 50</p>
         <h1>50代から、<br>もう一度<br><span class="accent">新しい仲間</span>ができる。</h1>
         <p class="lead">趣味、街歩き、学び、スポーツ、ボランティア。ひとり参加から始められる「大人の友活」を、50PLUSが見つけやすくします。</p>
@@ -47,15 +73,7 @@
           <a class="button button-ghost" href="listings.html">大阪の確認済み情報</a>
           <a class="button button-ghost" href="guides.html">ひとり参加のコツ</a>
         </div>
-      </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="hero-orbit"></div>
-        <div class="hero-card">
-          <strong>「行ってみる」<br>から始めよう。</strong>
-          <p>知らない街を歩く。新しいことを習う。いつもの生活に、ひとつ予定を増やす。</p>
-        </div>
-        <div class="hero-badge">大人の<br>友活</div>
-        <div class="hero-note">ひとり参加からOK。</div>
+        <p class="hero-media-caption">映像・写真はイメージです。実在の特定の人物・団体・出来事を示すものではありません。</p>
       </div>
     </div>
   </section>
