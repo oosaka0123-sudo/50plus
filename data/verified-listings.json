@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-09-04",
+  "verified_at": "2026-09-09",
   "policy": "Official-source facts only. Do not infer participant demographics, gender ratio, atmosphere, popularity, ratings, or pickup likelihood.",
   "items": [
     {
@@ -71,6 +71,54 @@
         "https://osakademanabu.com/umeda/"
       ],
       "verified_at": "2026-09-04"
+    },
+    {
+      "id": "osaka-lifelong-learning",
+      "kind": "resource",
+      "name": "大阪市立生涯学習センター 講座・イベント",
+      "category": "学び・講座・市民活動",
+      "area": "大阪市（梅田・阿倍野・難波）",
+      "summary": "大阪市立の生涯学習センター3館で、講座・イベント情報を案内している公式ページ。総合生涯学習センター、阿倍野市民学習センター、難波市民学習センターから探せる。",
+      "source_urls": [
+        "https://osakademanabu.com/event/"
+      ],
+      "verified_at": "2026-09-09"
+    },
+    {
+      "id": "osaka-civic-activity-info",
+      "kind": "resource",
+      "name": "大阪市 市民活動に関する相談・情報",
+      "category": "市民活動・ボランティア",
+      "area": "大阪市",
+      "summary": "大阪市公式の市民活動案内。市民活動総合ポータルサイトや、市内の中間支援組織・相談先への入口をまとめている。",
+      "source_urls": [
+        "https://www.city.osaka.lg.jp/shimin/page/0000497908.html"
+      ],
+      "verified_at": "2026-09-09"
+    },
+    {
+      "id": "osaka-sports-info",
+      "kind": "resource",
+      "name": "大阪市 スポーツ情報",
+      "category": "スポーツ・野外活動",
+      "area": "大阪市",
+      "summary": "大阪市公式のスポーツ情報ページ。市民向けのスポーツイベント、参加者募集、スポーツボランティアなどの情報を確認できる。",
+      "source_urls": [
+        "https://www.city.osaka.lg.jp/event/category/3030-2-0-0-0-0-0-0-0-0.html"
+      ],
+      "verified_at": "2026-09-09"
+    },
+    {
+      "id": "osaka-library-events",
+      "kind": "resource",
+      "name": "大阪市立図書館 イベント",
+      "category": "読書・文化・学び",
+      "area": "大阪市",
+      "summary": "大阪市立図書館の公式イベント一覧。読書会、講座、交流型企画など、市内各館の開催情報をまとめて確認できる。",
+      "source_urls": [
+        "https://www.oml.city.osaka.lg.jp/page/event.html"
+      ],
+      "verified_at": "2026-09-09"
     }
   ]
 }
