@@ -4,6 +4,20 @@
 
 This file is the operational handoff for one-time setup and repeatable remote operation. GitHub is the SSOT; do not rely on chat memory when this file and current repository state are available.
 
+## Council autopilot resume order
+
+Before starting any new implementation task, read `COUNCIL.md` and resolve
+priority in this order: an already-flagged `needs-human` Issue/PR, then any
+unfinished PR of the current implementer (failing CI to fix, review to
+request/confirm, merge readiness to confirm, deploy to verify, live
+production to verify), then duplicate/stale active work, then blocked
+Issues whose dependency resolved, then the next `ready` Issue by priority.
+`scripts/autopilot_status.py` implements this precedence deterministically
+from a GitHub-state snapshot; `.github/workflows/autopilot-watch.yml` runs
+hourly to surface duplicate/stale active work without ever calling an LLM
+or merging/deploying/deleting anything. Never start a second active
+implementation task while an unfinished PR of your own exists.
+
 ## Publishing architecture
 
 ### Primary production — dedicated GitHub Pages
@@ -219,6 +233,8 @@ Never fabricate live venue/event facts, schedules, prices, ratings, participant 
 For implementation tasks prefer:
 Issue -> Active Owner -> Branch -> Implementation -> Test -> PR -> Review -> Merge.
 
+Before opening a new branch, check for an existing open PR/branch of your own per `COUNCIL.md`'s resume order; an unfinished PR (CI, review, merge, deploy, live-verify) always outranks starting new work.
+
 For analysis-only tasks, follow the Issue's requested output without repository mutations.
 
-For long AI sessions, update `HANDOFF.md` instead of depending on conversation history.
+For long AI sessions, update `HANDOFF.md` instead of depending on conversation history. `HANDOFF.md` remains a cache of unresolved cross-session context, not SSOT or history; current GitHub Issues/PRs/Actions always override it when they disagree.

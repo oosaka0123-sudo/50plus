@@ -1,0 +1,94 @@
+name: Autopilot task
+description: A task tracked by the 50PLUS 3-agent council autopilot (see COUNCIL.md).
+title: "[Task]: "
+labels:
+  - "status:ready"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template feeds the council autopilot state machine defined in `COUNCIL.md`
+        and mirrored in `.github/autopilot-policy.json`. Fill in every field so any
+        agent (or the scheduled watcher) can resume this task from GitHub state alone.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to change and why.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Used for resume ordering when multiple issues are ready (COUNCIL.md priority order).
+      options:
+        - high
+        - medium
+        - low
+      default: 1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      description: >-
+        risk:medium or risk:high require a pre-implementation and pre-merge council
+        checkpoint (COUNCIL.md "Council checkpoints"). Paths matching
+        risk_elevating_path_patterns in .github/autopilot-policy.json (workflows,
+        robots.txt, sitemap.xml, the policy file itself) elevate risk automatically
+        even if this field is set lower.
+      options:
+        - low
+        - medium
+        - high
+      default: 0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: council_required
+    attributes:
+      label: Council checkpoint
+      description: Check this if pre-implementation council input is required regardless of the risk field (e.g. ambiguous acceptance criteria).
+      options:
+        - label: Requires explicit pre-implementation council review before coding starts
+          required: false
+
+  - type: checkboxes
+    id: human_only
+    attributes:
+      label: Human-only condition
+      description: >-
+        Check ONLY if this task genuinely involves one of the human-only categories
+        in COUNCIL.md: secrets/credentials, billing/paid usage, destructive
+        production/data change, permissions/visibility change, DNS/domain
+        ownership, legal/safety content, or a materially ambiguous business
+        decision. Do not check this for ordinary workflow/CI/content changes.
+      options:
+        - label: This task requires human-only action before or during implementation
+          required: false
+
+  - type: input
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Comma-separated issue numbers that must be closed before this one can start (e.g. "70, 71"). Leave blank if none.
+      placeholder: "e.g. 70, 71"
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance criteria
+      description: Concrete, checkable conditions that define this task as done. Avoid ambiguity that would otherwise require a human business decision mid-implementation.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true

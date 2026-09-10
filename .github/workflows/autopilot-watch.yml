@@ -1,0 +1,133 @@
+name: Autopilot Watch
+
+# Status watcher for the 50PLUS 3-agent council autopilot (COUNCIL.md).
+# It never calls an LLM, never merges, never deletes a branch, and never
+# touches secrets. scripts/autopilot_status.py (fed by
+# scripts/autopilot_snapshot.py) is the single decision engine for the next
+# action, including duplicate/stale-active detection; this workflow must not
+# re-implement that logic. It only ensures the autopilot labels exist, runs
+# the snapshot + resolver scripts, writes their result to the job summary,
+# and — for the two resolver actions that need a GitHub side effect
+# (flag_duplicate_active, flag_stale_active) — posts an idempotent marker
+# comment and applies the matching policy label to the resolver's target.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  deployments: read
+
+concurrency:
+  group: autopilot-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure autopilot labels exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY' > /tmp/labels.txt
+          import json
+          policy = json.loads(open('.github/autopilot-policy.json', encoding='utf-8').read())
+          names = set(policy.get('status_labels', {}).values())
+          names |= set(policy.get('risk_labels', {}).values())
+          names |= set(policy.get('priority_labels', {}).values())
+          for name in sorted(names):
+              print(name)
+          PY
+
+          while IFS= read -r label; do
+            [ -z "$label" ] && continue
+            if gh label list --limit 200 --json name -q '.[].name' | grep -Fxq "$label"; then
+              echo "label exists: $label"
+            else
+              gh label create "$label" --color "5319e7" --description "50PLUS autopilot label (see COUNCIL.md)"
+              echo "created label: $label"
+            fi
+          done < /tmp/labels.txt
+
+      - name: Build status snapshot and resolve next action
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/autopilot_snapshot.py --repo "${{ github.repository }}" > /tmp/snapshot.json
+          python3 scripts/autopilot_status.py /tmp/snapshot.json > /tmp/next-action.json
+
+          {
+            echo '## Autopilot Next Action'
+            echo ''
+            echo '```json'
+            cat /tmp/next-action.json
+            echo '```'
+            echo ''
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Actuate resolver action (duplicate/stale only)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          # This step is a thin actuator only. scripts/autopilot_status.py is the
+          # single decision engine for duplicate/stale detection (and everything
+          # else); this step must never re-derive that decision, only carry out
+          # the two resolver actions that require a GitHub side effect.
+          policy = json.loads(Path('.github/autopilot-policy.json').read_text(encoding='utf-8'))
+          next_action = json.loads(Path('/tmp/next-action.json').read_text(encoding='utf-8'))
+
+          actuated_actions = {
+              'flag_duplicate_active': policy['status_labels'].get('duplicate', 'autopilot:duplicate'),
+              'flag_stale_active': policy['status_labels'].get('stale', 'autopilot:stale'),
+          }
+
+          action_name = next_action.get('action')
+          label = actuated_actions.get(action_name)
+          summary_lines = ['# Autopilot Watch Actuator', '']
+
+          if label is None:
+              summary_lines.append(
+                  f'Resolver action is `{action_name}`; no GitHub-side effect required (summary-only).'
+              )
+          else:
+              target = next_action['target']
+              target_type = target['type']  # 'issue' or 'pull_request'
+              number = target['number']
+              gh_kind = 'issue' if target_type == 'issue' else 'pr'
+              marker = f'<!-- autopilot-watch:{action_name}:{target_type}-{number} -->'
+
+              existing_body = subprocess.run(
+                  ['gh', gh_kind, 'view', str(number), '--json', 'comments', '-q', '.comments[].body'],
+                  capture_output=True, text=True, check=False,
+              ).stdout
+
+              if marker in existing_body:
+                  summary_lines.append(
+                      f'`{action_name}` on {gh_kind} #{number}: marker already posted; not repeating comment or label.'
+                  )
+              else:
+                  comment_body = f"{marker}\n{next_action['reason']}"
+                  subprocess.run(['gh', gh_kind, 'comment', str(number), '--body', comment_body], check=True)
+                  subprocess.run(['gh', gh_kind, 'edit', str(number), '--add-label', label], check=False)
+                  summary_lines.append(
+                      f'`{action_name}`: posted comment and applied label `{label}` on {gh_kind} #{number}.'
+                  )
+
+          Path('/tmp/actuator-summary.md').write_text('\n'.join(summary_lines) + '\n', encoding='utf-8')
+          print('\n'.join(summary_lines))
+          PY
+
+          cat /tmp/actuator-summary.md >> "$GITHUB_STEP_SUMMARY"

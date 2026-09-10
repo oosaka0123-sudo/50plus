@@ -16,10 +16,11 @@ Before doing new work:
 
 1. Read current `oosaka0123-sudo/ai-master` `README.md`, `AGENTS.md`, `PROJECTS.md`.
 2. Confirm the current default branch of `oosaka0123-sudo/50plus`.
-3. Read `AGENTS.md`, `README.md`, `PROJECT_SPEC.md`, `RUNBOOK.md` and this `HANDOFF.md`.
+3. Read `AGENTS.md`, `README.md`, `PROJECT_SPEC.md`, `COUNCIL.md`, `RUNBOOK.md` and this `HANDOFF.md`.
 4. Claude Code also reads `CLAUDE.md`.
 5. Reconcile current Open Issues, Open PRs, latest Actions and current code before choosing work.
-6. If this handoff conflicts with current GitHub evidence, follow current GitHub evidence and update or retire this handoff as needed.
+6. If this handoff conflicts with current GitHub evidence, follow current GitHub evidence and update or retire this handoff as needed. This file is a cache only, never SSOT or history: it may record unresolved cross-session context, but current GitHub Issues/PRs/Actions always win when they disagree.
+7. Apply `COUNCIL.md`'s resume precedence: a flagged `needs-human` Issue/PR first, then any unfinished PR of your own (fix CI > confirm/request review > confirm merge readiness > verify deploy > verify live production) before starting any new Issue.
 
 ## Stable project foundation
 
@@ -88,7 +89,7 @@ Important current constraints:
 
 ### Re-entry message
 
-`Read current ai-master and 50PLUS main, then reconcile current Open Issues, Open PRs and latest Actions before choosing work. HANDOFF has no active implementation task; use current GitHub evidence as the source of truth.`
+`Read current ai-master and 50PLUS main, then COUNCIL.md, then reconcile current Open Issues, Open PRs and latest Actions before choosing work. Resolve priority via COUNCIL.md's resume order (unfinished PR before new work). HANDOFF has no active implementation task; use current GitHub evidence as the source of truth.`
 
 ## Current development rule
 

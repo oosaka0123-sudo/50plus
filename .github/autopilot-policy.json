@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "description": "Machine-readable policy for the 50PLUS 3-agent council autopilot. Mirrors COUNCIL.md; if they disagree, COUNCIL.md and this file must be reconciled together in the same change. Risk tier (risk_elevating_path_patterns) and human-only escalation (human_only_path_patterns, human_only_escalation_conditions, explicit PR/issue human_only_reason) are deliberately separate: an ordinary workflow/CI/content path change elevates risk and requires council review, it does not by itself stop autonomous progress.",
+  "states": [
+    "ready",
+    "council",
+    "active",
+    "ci",
+    "review",
+    "merge",
+    "deploy",
+    "live-verify",
+    "done",
+    "retry",
+    "blocked",
+    "needs-human"
+  ],
+  "terminal_states": ["done"],
+  "unfinished_pr_states": ["active", "ci", "review", "merge", "deploy", "live-verify", "retry"],
+  "status_labels": {
+    "ready": "status:ready",
+    "council": "status:council",
+    "active": "status:active",
+    "ci": "status:ci",
+    "review": "status:review",
+    "merge": "status:merge",
+    "deploy": "status:deploy",
+    "live-verify": "status:live-verify",
+    "done": "status:done",
+    "retry": "status:retry",
+    "blocked": "status:blocked",
+    "needs-human": "status:needs-human",
+    "duplicate": "autopilot:duplicate",
+    "stale": "autopilot:stale",
+    "review_unavailable": "review-unavailable"
+  },
+  "risk_labels": {
+    "low": "risk:low",
+    "medium": "risk:medium",
+    "high": "risk:high"
+  },
+  "priority_labels": {
+    "high": "priority:high",
+    "medium": "priority:medium",
+    "low": "priority:low"
+  },
+  "priority_order": ["high", "medium", "low"],
+  "resume_precedence": [
+    "needs_human_flagged",
+    "unfinished_pr",
+    "duplicate_or_stale_active",
+    "resolved_blocker",
+    "next_ready_issue",
+    "clean_no_action"
+  ],
+  "resume_precedence_notes": {
+    "unfinished_pr_excludes_duplicate_issue_prs": "An Issue with more than one open PR is never resolved under 'unfinished_pr': picking any single one of its PRs to act on (fix CI, request review, etc.) would be silently choosing a winner among duplicates, which single_owner_rule forbids. Those PRs are skipped in the unfinished_pr step and fall through to 'duplicate_or_stale_active', which must detect and flag them before any of that Issue's PRs is ever individually resolved."
+  },
+  "unfinished_pr_internal_order": [
+    "fix_own_ci_failure",
+    "confirm_or_request_review",
+    "confirm_merge_readiness",
+    "verify_deploy",
+    "verify_live_production"
+  ],
+  "single_owner_rule": {
+    "max_active_tasks_per_implementer": 1,
+    "duplicate_active_issue_action": "flag_needs_human_unless_trivially_resolvable"
+  },
+  "council_checkpoints": {
+    "pre_implementation_required_for_risk": ["medium", "high"],
+    "pre_merge_review_required_for_risk": ["medium", "high"],
+    "low_risk_review_unavailable_may_proceed": true,
+    "medium_or_high_risk_review_unavailable_action": "blocked"
+  },
+  "retry_limit": 3,
+  "stale_ttl_hours": 48,
+  "human_only_path_patterns": [
+    "scripts/*secret*",
+    "*secret*",
+    "*credential*",
+    "*.env",
+    "*.pem",
+    "*.key",
+    "CNAME"
+  ],
+  "risk_elevating_path_patterns": [
+    {"pattern": ".github/workflows/*", "min_risk": "high",
+     "note": "CI/CD pipeline change; requires council review before merge. Not automatically human-only unless it also touches secrets/permissions config (see human_only_path_patterns / explicit human_only_reason)."},
+    {"pattern": ".github/autopilot-policy.json", "min_risk": "high",
+     "note": "Changes the autopilot's own policy; requires council review before merge."},
+    {"pattern": "scripts/*preflight*", "min_risk": "medium"},
+    {"pattern": "robots.txt", "min_risk": "medium",
+     "note": "Affects search indexing; ordinary SEO content change, council review not human stop."},
+    {"pattern": "sitemap.xml", "min_risk": "medium",
+     "note": "Ordinary SEO content change, council review not human stop."}
+  ],
+  "human_only_escalation_conditions": [
+    "secrets_credentials_tokens_or_actions_secrets_config",
+    "billing_or_paid_usage_configuration",
+    "destructive_production_or_data_change",
+    "permissions_or_repository_visibility_change",
+    "dns_or_domain_ownership_change",
+    "legal_or_safety_content_decision",
+    "materially_ambiguous_business_decision"
+  ],
+  "auto_merge_allowed": false,
+  "llm_calls_in_scheduled_workflow_allowed": false
+}
