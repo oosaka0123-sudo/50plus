@@ -1,22 +1,8 @@
 (() => {
-  const root = document.querySelector('[data-listing-filters]');
-  if (!root) return;
-
-  const search = root.querySelector('[data-listing-search]');
-  const buttons = Array.from(root.querySelectorAll('[data-listing-kind]'));
-  const periodButtons = Array.from(root.querySelectorAll('[data-listing-period]'));
   const cards = Array.from(document.querySelectorAll('[data-listing-card]'));
+  if (cards.length === 0) return;
+
   const sections = Array.from(document.querySelectorAll('[data-listing-section]'));
-  const count = root.querySelector('[data-listing-count]');
-  const empty = root.querySelector('[data-listing-empty]');
-
-  let activeKind = 'all';
-  let activePeriod = 'all';
-
-  const normalize = (value) => String(value || '')
-    .toLocaleLowerCase('ja')
-    .replace(/\s+/g, ' ')
-    .trim();
 
   const parseISODate = (value) => {
     if (!value) return null;
@@ -32,6 +18,55 @@
   };
 
   const today = () => startOfDay(new Date());
+
+  const isExpired = (card) => {
+    if (card.dataset.kind !== 'event') return false;
+
+    const occurrenceRaw = card.dataset.occurrenceDates;
+    if (occurrenceRaw) {
+      const dates = occurrenceRaw
+        .split(',')
+        .map((value) => parseISODate(value.trim()))
+        .filter(Boolean);
+      if (dates.length === 0) return false;
+      return dates.every((date) => date < today());
+    }
+
+    const endDate = parseISODate(card.dataset.endDate) || parseISODate(card.dataset.startDate);
+    if (!endDate) return false;
+    return endDate < today();
+  };
+
+  const hideExpiredSections = () => {
+    sections.forEach((section) => {
+      const sectionCards = Array.from(section.querySelectorAll('[data-listing-card]'));
+      section.hidden = sectionCards.length > 0 && sectionCards.every((card) => card.hidden);
+    });
+  };
+
+  const root = document.querySelector('[data-listing-filters]');
+
+  if (!root) {
+    cards.forEach((card) => {
+      if (isExpired(card)) card.hidden = true;
+    });
+    hideExpiredSections();
+    return;
+  }
+
+  const search = root.querySelector('[data-listing-search]');
+  const buttons = Array.from(root.querySelectorAll('[data-listing-kind]'));
+  const periodButtons = Array.from(root.querySelectorAll('[data-listing-period]'));
+  const count = root.querySelector('[data-listing-count]');
+  const empty = root.querySelector('[data-listing-empty]');
+
+  let activeKind = 'all';
+  let activePeriod = 'all';
+
+  const normalize = (value) => String(value || '')
+    .toLocaleLowerCase('ja')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   const endOfWeek = (base) => {
     const copy = new Date(base);
@@ -98,16 +133,13 @@
       const kindMatches = activeKind === 'all' || card.dataset.kind === activeKind;
       const periodMatches = matchesPeriod(card, activePeriod);
       const textMatches = !query || normalize(card.textContent).includes(query);
-      const visible = kindMatches && periodMatches && textMatches;
+      const visible = !isExpired(card) && kindMatches && periodMatches && textMatches;
 
       card.hidden = !visible;
       if (visible) visibleCount += 1;
     });
 
-    sections.forEach((section) => {
-      const sectionCards = Array.from(section.querySelectorAll('[data-listing-card]'));
-      section.hidden = sectionCards.length > 0 && sectionCards.every((card) => card.hidden);
-    });
+    hideExpiredSections();
 
     if (count) count.textContent = `${visibleCount}件を表示中`;
     if (empty) empty.hidden = visibleCount !== 0;

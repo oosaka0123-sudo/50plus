@@ -84,11 +84,11 @@ Current unmerged work on this branch:
 - `data/verified-listings.json` now has 13 total records: the previous 8 plus 5 official-source Osaka events verified on 2026-09-10.
 - The two existing multi-date events now have `occurrence_dates`; the five new events also have machine-readable occurrence dates.
 - A machine comparison confirmed the previous 8 records' factual fields were unchanged except for the intentional `occurrence_dates` additions to the two existing events.
-- `scripts/render_listings.py` has an in-progress change to emit event start/end/occurrence dates as data attributes and add `すべて / 今週 / 今月` period controls on `listings.html`.
-- `assets/listings-filter.js` has an in-progress client-side period filter. It computes the current week/month at runtime and uses `occurrence_dates` when present, avoiding stale baked-in relative labels.
-- The generated HTML files have **not yet been regenerated**, so `python scripts/render_listings.py --check` currently fails for `listings.html` and all four topic hubs. This is expected at the handoff point and must be resolved before PR.
-- Browser QA has not yet been extended to test the period filters.
-- No commit from Issue #76 is merged to main and no Issue #76 PR exists yet at this handoff point.
+- `scripts/render_listings.py` emits event start/end/occurrence dates as data attributes and adds `すべて / 今週 / 今月` period controls on `listings.html`.
+- `assets/listings-filter.js` computes current week/month at runtime, uses `occurrence_dates` when present, and hides expired event cards on Listings plus all four topic hubs while leaving resource cards visible.
+- The generated HTML files have been regenerated and `python scripts/render_listings.py --check` passes for `listings.html` and all four topic hubs.
+- Browser QA now covers `すべて / 今週 / 今月`, kind-filter interaction, no-match/reset behavior, and runtime expiry on Listings plus all four topic hubs using a fixed far-future clock; the local run passed for 11 pages across desktop and 390px mobile.
+- Issue #76 is not merged to main yet; local implementation and QA are ready for commit/push and PR.
 
 Five new event records currently staged in the canonical JSON are:
 
@@ -109,20 +109,15 @@ Council / automation state:
 
 ### Exact next steps
 
-1. Read current GitHub Issue #76, any open PRs, latest Actions, then this branch before editing.
-2. Review the in-progress diffs in `data/verified-listings.json`, `scripts/render_listings.py`, and `assets/listings-filter.js` rather than restarting them.
-3. Validate `occurrence_dates` semantics and ensure single-date events retain matching `start_date` / `end_date`.
-4. Run `python scripts/render_listings.py` to regenerate `listings.html` plus the four topic hubs, then run `--check` until all five surfaces are in sync.
-5. Extend `scripts/browser_qa.mjs` to verify `今週 / 今月 / すべて`, including the interaction with kind filters and no-match/reset behavior.
-6. Run JSON/event validation, deterministic render check, local/static checks, and Browser QA.
-7. Send the final diff to Gemini for independent review. Fix any blocker on the same Issue/branch.
-8. Commit/push, open the Issue #76 PR, wait for required CI/Browser QA, then merge only if green.
-9. Verify Pages deployment and live production before closing Issue #76.
-10. Track the GitHub Claude Action `is_error:true` failure as a separate repair task; do not mix that repair into Issue #76 unless it becomes necessary to finish #76 safely.
+1. Commit/push the completed Issue #76 branch and open its PR.
+2. Wait for required PR checks and Browser QA; fix any branch-owned failure within the retry policy.
+3. Merge only after required checks are green and review has no blocker.
+4. Verify the GitHub Pages deployment and live production behavior before closing Issue #76.
+5. Track the GitHub Claude Action `is_error:true` failure as a separate repair task; do not mix it into Issue #76 unless it becomes necessary to finish #76 safely.
 
 ### Re-entry message
 
-`Resume 50PLUS Issue #76 from branch feat/issue-76-upcoming-events. Read current GitHub Issue/PR/Actions and HANDOFF.md first. Do not restart the event work: 5 official-source events and the in-progress runtime 今週/今月 filter are already present. Regenerate deterministic HTML, add Browser QA for period filters, run all checks, Gemini-review the final diff, then PR -> CI -> merge -> Pages -> live verify. GitHub @claude auth passes but the Action currently dies with result is_error:true; use Surface Claude fallback for #76.`
+`Resume 50PLUS Issue #76 from branch feat/issue-76-upcoming-events. Implementation, deterministic HTML regeneration, local/static checks, Browser QA, expiry coverage, and final Gemini review are complete. Continue with commit/push -> PR -> CI -> merge -> Pages -> live verify. GitHub @claude auth passes but the Action currently dies with result is_error:true; keep that as a separate repair task.`
 ## Current development rule
 
 After reconciliation:
