@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render the verified-listing section of listings.html from canonical JSON data."""
+"""Render verified-listing sections in listings.html and the topic hub pages from canonical JSON data."""
 
 from __future__ import annotations
 
@@ -16,6 +16,43 @@ DATA_PATH = ROOT / "data" / "verified-listings.json"
 HTML_PATH = ROOT / "listings.html"
 START = "<!-- VERIFIED_LISTINGS_GENERATED_START -->"
 END = "<!-- VERIFIED_LISTINGS_GENERATED_END -->"
+
+HUBS = [
+    {
+        "path": ROOT / "learning.html",
+        "topic": "learning",
+        "start": "<!-- TOPIC_LEARNING_GENERATED_START -->",
+        "end": "<!-- TOPIC_LEARNING_GENERATED_END -->",
+        "heading": "大阪で確認できた<br>学び・講座の情報。",
+        "intro": "50PLUSが公式情報で確認できた、大阪の学び・講座に関する情報です。日時・対象・料金・申込方法は、必ずリンク先の公式ページで最新情報を確認してください。",
+    },
+    {
+        "path": ROOT / "volunteering.html",
+        "topic": "volunteering",
+        "start": "<!-- TOPIC_VOLUNTEERING_GENERATED_START -->",
+        "end": "<!-- TOPIC_VOLUNTEERING_GENERATED_END -->",
+        "heading": "大阪で確認できた<br>ボランティア・市民活動の情報。",
+        "intro": "50PLUSが公式情報で確認できた、大阪のボランティア・市民活動に関する情報です。活動内容・参加条件・申込方法は、必ずリンク先の公式ページで最新情報を確認してください。",
+    },
+    {
+        "path": ROOT / "sports.html",
+        "topic": "sports",
+        "start": "<!-- TOPIC_SPORTS_GENERATED_START -->",
+        "end": "<!-- TOPIC_SPORTS_GENERATED_END -->",
+        "heading": "大阪で確認できた<br>スポーツの情報。",
+        "intro": "50PLUSが公式情報で確認できた、大阪のスポーツに関する情報です。開催日・参加条件・申込方法は、必ずリンク先の公式ページで最新情報を確認してください。",
+    },
+    {
+        "path": ROOT / "culture-library.html",
+        "topic": "culture",
+        "start": "<!-- TOPIC_CULTURE_GENERATED_START -->",
+        "end": "<!-- TOPIC_CULTURE_GENERATED_END -->",
+        "heading": "大阪で確認できた<br>文化・図書館の情報。",
+        "intro": "50PLUSが公式情報で確認できた、大阪の文化・図書館に関する情報です。日時・対象・料金・申込方法は、必ずリンク先の公式ページで最新情報を確認してください。",
+    },
+]
+
+VALID_TOPICS = {hub["topic"] for hub in HUBS}
 
 
 def esc(value: object) -> str:
@@ -137,42 +174,95 @@ def render_block(data: dict) -> str:
     return "\n\n".join(parts)
 
 
-def expected_html(current: str, data: dict) -> str:
-    if START not in current or END not in current:
-        raise ValueError("Generated-listing markers are missing from listings.html")
-    generated = f"{START}\n{render_block(data)}\n  {END}"
-    pattern = re.compile(re.escape(START) + r".*?" + re.escape(END), re.DOTALL)
+def render_topic_block(data: dict, topic: str, heading: str, intro: str) -> str:
+    items = [item for item in data["items"] if topic in item.get("topics", [])]
+    resources = [item for item in items if item.get("kind") == "resource"]
+    events = [item for item in items if item.get("kind") == "event"]
+    verified_at = ja_date(data["verified_at"])
+
+    number = 1
+    cards = []
+    for item in resources:
+        cards.append(render_resource(item, number))
+        number += 1
+    for item in events:
+        cards.append(render_event(item, number))
+        number += 1
+
+    parts = [
+        f'  <section class="section-tight"><div class="narrow"><div class="notice"><strong>最終確認日：{verified_at}</strong><br>参加者の男女比、年齢層、雰囲気、人気度など、公式に確認できない情報は掲載していません。イベント情報は変更・中止の可能性があるため、申込前に必ず公式ページで最新情報を確認してください。</div></div></section>',
+    ]
+
+    if cards:
+        parts.append(
+            f'  <section class="section" data-listing-section="topic"><div class="container"><div class="section-heading reveal"><div><p class="eyebrow">Verified in Osaka</p><h2>{heading}</h2></div><p>{intro}</p></div><div class="card-grid">\n'
+            + "\n".join(cards)
+            + "\n  </div></div></section>"
+        )
+    else:
+        parts.append(
+            '  <section class="section-tight"><div class="narrow"><div class="notice"><strong>現在、確認済みの掲載情報はありません。</strong><br>公式情報が確認でき次第、随時追加します。</div></div></section>'
+        )
+
+    return "\n\n".join(parts)
+
+
+def substitute(current: str, start: str, end: str, block: str, *, label: str) -> str:
+    if start not in current or end not in current:
+        raise ValueError(f"Generated-listing markers are missing from {label}")
+    generated = f"{start}\n{block}\n  {end}"
+    pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.DOTALL)
     return pattern.sub(generated, current, count=1)
+
+
+def expected_html(current: str, data: dict) -> str:
+    return substitute(current, START, END, render_block(data), label="listings.html")
+
+
+def expected_hub_html(current: str, data: dict, hub: dict) -> str:
+    block = render_topic_block(data, hub["topic"], hub["heading"], hub["intro"])
+    return substitute(current, hub["start"], hub["end"], block, label=hub["path"].name)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--check", action="store_true", help="Fail if listings.html is not in sync with JSON")
+    parser.add_argument("--check", action="store_true", help="Fail if generated HTML is not in sync with JSON")
     args = parser.parse_args()
 
     data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
-    current = HTML_PATH.read_text(encoding="utf-8")
 
-    try:
-        expected = expected_html(current, data)
-    except (KeyError, ValueError) as exc:
-        print(f"render error: {exc}", file=sys.stderr)
-        return 1
+    targets = [(HTML_PATH, lambda current: expected_html(current, data))]
+    for hub in HUBS:
+        targets.append((hub["path"], lambda current, hub=hub: expected_hub_html(current, data, hub)))
+
+    in_sync = True
+    for path, expected_fn in targets:
+        current = path.read_text(encoding="utf-8")
+        try:
+            expected = expected_fn(current)
+        except (KeyError, ValueError) as exc:
+            print(f"render error: {exc}", file=sys.stderr)
+            return 1
+
+        if args.check:
+            if current != expected:
+                print(f"{path.name} is out of sync with data/verified-listings.json", file=sys.stderr)
+                in_sync = False
+            continue
+
+        if current == expected:
+            print(f"{path.name} is already up to date.")
+        else:
+            path.write_text(expected, encoding="utf-8")
+            print(f"Updated {path.name} from data/verified-listings.json.")
 
     if args.check:
-        if current != expected:
-            print("listings.html is out of sync with data/verified-listings.json", file=sys.stderr)
+        if not in_sync:
             print("Run: python3 scripts/render_listings.py", file=sys.stderr)
             return 1
         print("Verified listings HTML is in sync with canonical JSON.")
         return 0
 
-    if current == expected:
-        print("listings.html is already up to date.")
-        return 0
-
-    HTML_PATH.write_text(expected, encoding="utf-8")
-    print("Updated listings.html from data/verified-listings.json.")
     return 0
 
 

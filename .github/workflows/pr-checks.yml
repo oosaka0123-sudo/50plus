@@ -31,6 +31,10 @@ jobs:
               Path('guides.html'),
               Path('about.html'),
               Path('contact.html'),
+              Path('learning.html'),
+              Path('volunteering.html'),
+              Path('sports.html'),
+              Path('culture-library.html'),
               Path('assets/styles.css'),
               Path('assets/main.js'),
               Path('data/verified-listings.json'),
@@ -97,6 +101,7 @@ jobs:
           data = json.loads(path.read_text(encoding='utf-8'))
           errors = []
           today = date.today()
+          valid_topics = {'learning', 'volunteering', 'sports', 'culture'}
 
           if data.get('schema_version') != 1:
               errors.append('schema_version must be 1')
@@ -120,6 +125,14 @@ jobs:
 
               if item.get('kind') not in {'resource', 'event'}:
                   errors.append(f'{prefix}: kind must be resource or event')
+
+              topics = item.get('topics')
+              if not isinstance(topics, list) or not topics:
+                  errors.append(f'{prefix}: topics must be a non-empty list')
+              else:
+                  invalid_topics = sorted(set(topics) - valid_topics)
+                  if invalid_topics:
+                      errors.append(f'{prefix}: invalid topics {invalid_topics}; must be one of {sorted(valid_topics)}')
 
               urls = item.get('source_urls', [])
               if not isinstance(urls, list) or not urls:
