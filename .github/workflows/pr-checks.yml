@@ -40,6 +40,11 @@ jobs:
               Path('data/verified-listings.json'),
               Path('scripts/render_listings.py'),
               Path('PROJECT_SPEC.md'),
+              Path('COUNCIL.md'),
+              Path('.github/autopilot-policy.json'),
+              Path('scripts/autopilot_status.py'),
+              Path('.github/workflows/autopilot-watch.yml'),
+              Path('.github/ISSUE_TEMPLATE/autopilot-task.yml'),
           ]
 
           missing = [str(p) for p in required if not p.exists()]
@@ -193,6 +198,102 @@ jobs:
 
       - name: Verify listings HTML is generated from JSON
         run: python3 scripts/render_listings.py --check
+
+      - name: Validate autopilot policy JSON
+        run: |
+          python3 - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          path = Path('.github/autopilot-policy.json')
+          try:
+              policy = json.loads(path.read_text(encoding='utf-8'))
+          except (OSError, json.JSONDecodeError) as exc:
+              print(f'{path} is missing or not valid JSON: {exc}')
+              sys.exit(1)
+
+          errors = []
+          required_top_level = [
+              'states', 'terminal_states', 'unfinished_pr_states', 'status_labels',
+              'risk_labels', 'priority_labels', 'priority_order', 'resume_precedence',
+              'retry_limit', 'stale_ttl_hours', 'human_only_path_patterns',
+              'risk_elevating_path_patterns', 'human_only_escalation_conditions',
+              'auto_merge_allowed', 'llm_calls_in_scheduled_workflow_allowed',
+          ]
+          for key in required_top_level:
+              if key not in policy:
+                  errors.append(f'missing required key: {key}')
+
+          if policy.get('auto_merge_allowed') is not False:
+              errors.append('auto_merge_allowed must be false')
+          if policy.get('llm_calls_in_scheduled_workflow_allowed') is not False:
+              errors.append('llm_calls_in_scheduled_workflow_allowed must be false')
+
+          # human_only_path_patterns must stay narrow: ordinary workflow/robots/sitemap
+          # paths belong in risk_elevating_path_patterns, not here, per COUNCIL.md.
+          human_only = policy.get('human_only_path_patterns', [])
+          for guard_pattern in ('.github/workflows/*', 'robots.txt', 'sitemap.xml'):
+              if guard_pattern in human_only:
+                  errors.append(
+                      f"'{guard_pattern}' must not be in human_only_path_patterns; "
+                      "ordinary workflow/SEO changes are risk-elevating, not human-only"
+                  )
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('autopilot-policy.json is structurally valid and consistent with COUNCIL.md.')
+          PY
+
+      - name: Run autopilot status self-test
+        run: python3 scripts/autopilot_status.py --self-test
+
+      - name: Verify autopilot watcher invokes status resolver and has no second decision engine
+        run: |
+          python3 - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          path = Path('.github/workflows/autopilot-watch.yml')
+          text = path.read_text(encoding='utf-8')
+
+          required = [
+              (r'python3\s+scripts/autopilot_snapshot\.py', 'must build its input via scripts/autopilot_snapshot.py'),
+              (r'python3\s+scripts/autopilot_status\.py', 'must invoke scripts/autopilot_status.py'),
+              (r'GITHUB_STEP_SUMMARY', 'must write its result to GITHUB_STEP_SUMMARY'),
+              (r'next-action\.json', 'its actuator step must read the resolver output file (next-action.json)'),
+          ]
+          errors = [f'{path}: {msg}' for pattern, msg in required if not re.search(pattern, text)]
+
+          # scripts/autopilot_status.py (and the snapshot builder) must be the ONLY
+          # duplicate/stale decision engine. These identifiers are unique to that
+          # inline detection logic; their presence here means the workflow is
+          # re-deriving the decision instead of only actuating the resolver's output.
+          forbidden = [
+              r'detect_duplicate',
+              r'detect_stale',
+              r'stale_ttl_hours',
+              r'age_hours',
+              r'closing_re',
+              r'by_issue\b',
+              r'active_labels\s*=',
+              r'datetime\.now\(',
+              r'parse_time\(',
+          ]
+          errors += [
+              f'{path}: forbidden pattern {pattern!r} found; watcher must not re-implement '
+              'duplicate/stale decision logic, only actuate scripts/autopilot_status.py output'
+              for pattern in forbidden if re.search(pattern, text)
+          ]
+
+          if errors:
+              print('\n'.join(errors))
+              sys.exit(1)
+          print('autopilot-watch.yml statically invokes the snapshot + status resolver scripts '
+                'and contains no second duplicate/stale decision implementation.')
+          PY
 
       - name: Reject common secret patterns in tracked source
         run: |

@@ -6,9 +6,12 @@ This repository is the project SSOT for 50PLUS. Global governance is defined by 
 
 1. Read current `oosaka0123-sudo/ai-master` default branch: `README.md`, `AGENTS.md`, then `PROJECTS.md`.
 2. Confirm this repository's current default branch.
-3. Read this `AGENTS.md`, `README.md`, `PROJECT_SPEC.md`, `RUNBOOK.md` and `HANDOFF.md` when present.
+3. Read this `AGENTS.md`, `README.md`, `PROJECT_SPEC.md`, `COUNCIL.md`, `RUNBOOK.md` and `HANDOFF.md` when present.
 4. Check open Issues, open PRs, latest Actions and current code before implementation.
 5. Treat GitHub current state as authoritative over chat history or model memory.
+6. Resolve priority using `COUNCIL.md`'s resume order: an unfinished PR of your own (failing CI, pending review, pending merge, pending deploy, pending live verification) always outranks starting a new Issue. Only pick up new work after confirming no such unfinished PR exists.
+
+`COUNCIL.md` is the canonical definition of the 3-agent council state machine, priorities, retry limits and human-only escalation conditions. `.github/autopilot-policy.json` is its machine-readable mirror, checked by `scripts/autopilot_status.py`. Do not redefine these rules elsewhere; update `COUNCIL.md` and the policy file together if they need to change.
 
 ## Product Boundary
 
@@ -78,4 +81,4 @@ The existing Lolipop preflight/deploy workflows are retained as a manual fallbac
 
 ## Handoff
 
-Follow the ai-master context handoff protocol. Use `HANDOFF.md` for useful unresolved cross-session context and keep GitHub Issues/PRs/Actions as the source for dynamic history.
+Follow the ai-master context handoff protocol. Use `HANDOFF.md` for useful unresolved cross-session context and keep GitHub Issues/PRs/Actions as the source for dynamic history. `HANDOFF.md` is a cache, not SSOT: if it disagrees with current GitHub state, GitHub wins and the handoff must be corrected, not trusted.
