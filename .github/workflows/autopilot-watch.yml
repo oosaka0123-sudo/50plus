@@ -15,6 +15,13 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'
+  workflow_run:
+    workflows:
+      - 'PR checks'
+      - 'Browser QA'
+      - 'Deploy 50PLUS GitHub Pages'
+    types:
+      - completed
 
 permissions:
   contents: read
