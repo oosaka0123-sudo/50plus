@@ -1,6 +1,6 @@
 # 50PLUS — HANDOFF
 
-Updated: 2026-09-09 JST
+Updated: 2026-09-10 JST
 
 ## Purpose
 
@@ -75,22 +75,54 @@ Do not change unrelated `rss7.net` DNS records.
 
 ## Current cross-session state
 
-There is **no active implementation task designated by this handoff**.
+Active implementation task: **Issue #76 — Add verified upcoming Osaka events and current discovery flow**.
 
-After the resume-order reconciliation, choose the next task from current GitHub evidence rather than from a completed task recorded in an old chat or handoff.
+Current working branch: `feat/issue-76-upcoming-events` based on main commit `7dcd32900b97135c0b16e80ca074956cb6326a02`.
 
-Important current constraints:
+Current unmerged work on this branch:
 
-- Respect any Issue explicitly marked `ANALYSIS ONLY`: do not create or modify repository files, branches, commits, PRs or production for that Issue.
-- Human-owned authentication/setup must never be assumed complete from an old note; verify the current Issue and current runtime state first.
-- Google Media MCP has been verified end-to-end for 50PLUS. For future media work, reuse the existing infrastructure and repository-local MCP configuration; do not recreate Cloud Run / Vertex AI infrastructure merely because a stale note says approval is pending.
-- Before future Google Media generation, follow current `CLAUDE.md` and repository preflight guidance. Never expose or persist bearer tokens or other secrets.
-- Finished production media must remain static committed assets; page viewing must not depend on live AI generation.
+- `data/verified-listings.json` now has 13 total records: the previous 8 plus 5 official-source Osaka events verified on 2026-09-10.
+- The two existing multi-date events now have `occurrence_dates`; the five new events also have machine-readable occurrence dates.
+- A machine comparison confirmed the previous 8 records' factual fields were unchanged except for the intentional `occurrence_dates` additions to the two existing events.
+- `scripts/render_listings.py` has an in-progress change to emit event start/end/occurrence dates as data attributes and add `すべて / 今週 / 今月` period controls on `listings.html`.
+- `assets/listings-filter.js` has an in-progress client-side period filter. It computes the current week/month at runtime and uses `occurrence_dates` when present, avoiding stale baked-in relative labels.
+- The generated HTML files have **not yet been regenerated**, so `python scripts/render_listings.py --check` currently fails for `listings.html` and all four topic hubs. This is expected at the handoff point and must be resolved before PR.
+- Browser QA has not yet been extended to test the period filters.
+- No commit from Issue #76 is merged to main and no Issue #76 PR exists yet at this handoff point.
+
+Five new event records currently staged in the canonical JSON are:
+
+- 2026-09-26 認知症サポーター養成講座
+- 2026-10-03 読書前のヨガ・タイム
+- 2026-10-09 読書会『憑神』
+- 2026-10-11 オータム・チャレンジ・スポーツ ニュースポーツ体験会
+- 2026-10-31 小さな読書交流会-わたしの1冊、あなたの1冊-
+
+Council / automation state:
+
+- Council Autopilot core is merged and live.
+- Event-driven `Autopilot Watch` is merged and verified in production; Pages completion successfully triggered the watcher and produced `no_action_clean` when the queue was empty.
+- Issue #76 was then created and moved to `status:active`, `priority:high`, `risk:low` so development could continue.
+- GitHub `@claude` automation currently authenticates successfully (`ANTHROPIC_API_KEY` present) but the Claude Code Action fails immediately after model initialization with `result is_error:true`. Do not treat this as a missing-secret problem.
+- Until that GitHub Action failure is repaired, use the connected Surface Claude Code as the implementation owner for Issue #76, with Gemini as independent reviewer and ChatGPT as PM/integrator.
+- Surface Claude has repeatedly consumed max-turns during broad tasks; keep follow-up work narrowly split by file/phase instead of reissuing the whole Issue.
+
+### Exact next steps
+
+1. Read current GitHub Issue #76, any open PRs, latest Actions, then this branch before editing.
+2. Review the in-progress diffs in `data/verified-listings.json`, `scripts/render_listings.py`, and `assets/listings-filter.js` rather than restarting them.
+3. Validate `occurrence_dates` semantics and ensure single-date events retain matching `start_date` / `end_date`.
+4. Run `python scripts/render_listings.py` to regenerate `listings.html` plus the four topic hubs, then run `--check` until all five surfaces are in sync.
+5. Extend `scripts/browser_qa.mjs` to verify `今週 / 今月 / すべて`, including the interaction with kind filters and no-match/reset behavior.
+6. Run JSON/event validation, deterministic render check, local/static checks, and Browser QA.
+7. Send the final diff to Gemini for independent review. Fix any blocker on the same Issue/branch.
+8. Commit/push, open the Issue #76 PR, wait for required CI/Browser QA, then merge only if green.
+9. Verify Pages deployment and live production before closing Issue #76.
+10. Track the GitHub Claude Action `is_error:true` failure as a separate repair task; do not mix that repair into Issue #76 unless it becomes necessary to finish #76 safely.
 
 ### Re-entry message
 
-`Read current ai-master and 50PLUS main, then COUNCIL.md, then reconcile current Open Issues, Open PRs and latest Actions before choosing work. Resolve priority via COUNCIL.md's resume order (unfinished PR before new work). HANDOFF has no active implementation task; use current GitHub evidence as the source of truth.`
-
+`Resume 50PLUS Issue #76 from branch feat/issue-76-upcoming-events. Read current GitHub Issue/PR/Actions and HANDOFF.md first. Do not restart the event work: 5 official-source events and the in-progress runtime 今週/今月 filter are already present. Regenerate deterministic HTML, add Browser QA for period filters, run all checks, Gemini-review the final diff, then PR -> CI -> merge -> Pages -> live verify. GitHub @claude auth passes but the Action currently dies with result is_error:true; use Surface Claude fallback for #76.`
 ## Current development rule
 
 After reconciliation:

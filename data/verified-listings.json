@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_at": "2026-09-09",
+  "verified_at": "2026-09-10",
   "policy": "Official-source facts only. Do not infer participant demographics, gender ratio, atmosphere, popularity, ratings, or pickup likelihood.",
   "items": [
     {
@@ -43,6 +43,18 @@
       "schedule": "2026年9月30日〜12月16日（10月14日・21日を除く毎週水曜日）19:00〜21:00、全10回",
       "start_date": "2026-09-30",
       "end_date": "2026-12-16",
+      "occurrence_dates": [
+        "2026-09-30",
+        "2026-10-07",
+        "2026-10-28",
+        "2026-11-04",
+        "2026-11-11",
+        "2026-11-18",
+        "2026-11-25",
+        "2026-12-02",
+        "2026-12-09",
+        "2026-12-16"
+      ],
       "eligibility": "どなたでも",
       "capacity": "24人・先着",
       "registration_period": "2026年7月29日〜9月29日",
@@ -65,6 +77,13 @@
       "schedule": "2026年10月17日・24日、11月7日・21日、12月5日 10:00〜12:00、全5回",
       "start_date": "2026-10-17",
       "end_date": "2026-12-05",
+      "occurrence_dates": [
+        "2026-10-17",
+        "2026-10-24",
+        "2026-11-07",
+        "2026-11-21",
+        "2026-12-05"
+      ],
       "eligibility": "どなたでも",
       "capacity": "15人・先着",
       "fee": "受講料7,500円／5回（作品制作から参加は6,000円）、2,000円／1回。材料費2,950円。",
@@ -127,6 +146,119 @@
         "https://www.oml.city.osaka.lg.jp/page/event.html"
       ],
       "verified_at": "2026-09-09"
+    },
+    {
+      "id": "dementia-supporter-yodogawa-20260926",
+      "kind": "event",
+      "name": "認知症サポーター養成講座",
+      "category": "学び・ボランティア",
+      "topics": ["learning", "volunteering"],
+      "area": "大阪市淀川区",
+      "venue": "淀川図書館 多目的室",
+      "schedule": "2026年9月26日（土曜日）14:00〜15:30",
+      "start_date": "2026-09-26",
+      "end_date": "2026-09-26",
+      "occurrence_dates": [
+        "2026-09-26"
+      ],
+      "capacity": "25名・事前申込先着順",
+      "registration_period": "2026年9月6日〜9月25日",
+      "summary": "認知症を正しく理解し、認知症の方や家族を見守る応援者について学ぶ講座。ボランティア活動に関心がある方にも案内されている。",
+      "source_urls": [
+        "https://www.oml.city.osaka.lg.jp/key/2026/61_2026090901.html"
+      ],
+      "verified_at": "2026-09-10"
+    },
+    {
+      "id": "reading-yoga-joto-20261003",
+      "kind": "event",
+      "name": "読書前のヨガ・タイム",
+      "category": "ヨガ・読書",
+      "topics": ["sports", "culture", "learning"],
+      "area": "大阪市城東区",
+      "venue": "城東図書館 多目的室",
+      "schedule": "2026年10月3日（土曜日）11:00〜11:30",
+      "start_date": "2026-10-03",
+      "end_date": "2026-10-03",
+      "occurrence_dates": [
+        "2026-10-03"
+      ],
+      "eligibility": "どなたでも",
+      "capacity": "10名・当日先着順",
+      "summary": "いすを使ったヨガの後、司書がおすすめの本を紹介する30分の催し。",
+      "source_urls": [
+        "https://www.oml.city.osaka.lg.jp/key/2026/66_2026090601.html"
+      ],
+      "verified_at": "2026-09-10"
+    },
+    {
+      "id": "book-club-tsukigami-20261009",
+      "kind": "event",
+      "name": "読書会『憑神』",
+      "category": "読書・文化",
+      "topics": ["culture", "learning"],
+      "area": "大阪市鶴見区",
+      "venue": "鶴見図書館 多目的室",
+      "schedule": "2026年10月9日（金曜日）10:15〜12:00",
+      "start_date": "2026-10-09",
+      "end_date": "2026-10-09",
+      "occurrence_dates": [
+        "2026-10-09"
+      ],
+      "eligibility": "どなたでも",
+      "capacity": "20人・事前申込先着順",
+      "fee": "無料",
+      "summary": "課題図書『憑神』（浅田次郎／著）を事前に読み、参加者同士で感想を語り合う読書会。",
+      "source_urls": [
+        "https://www.oml.city.osaka.lg.jp/key/2026/67_2026090103.html"
+      ],
+      "verified_at": "2026-09-10"
+    },
+    {
+      "id": "ikuno-new-sports-20261011",
+      "kind": "event",
+      "name": "オータム・チャレンジ・スポーツ ニュースポーツ体験会",
+      "category": "スポーツ・体験",
+      "topics": ["sports"],
+      "area": "大阪市生野区",
+      "venue": "大阪市立生野スポーツセンター",
+      "address": "大阪市生野区巽西1丁目1番3号",
+      "schedule": "2026年10月11日（日曜日）",
+      "start_date": "2026-10-11",
+      "end_date": "2026-10-11",
+      "occurrence_dates": [
+        "2026-10-11"
+      ],
+      "fee": "無料",
+      "registration_period": "申込不要",
+      "summary": "スクエアボッチャ、ガラッキー、モルック、公式輪投げ、大縄跳び、ガチメンなどのニュースポーツを体験できる催し。参加無料・申込不要。",
+      "source_urls": [
+        "https://www.city.osaka.lg.jp/ikuno/page/0000684352.html"
+      ],
+      "verified_at": "2026-09-10"
+    },
+    {
+      "id": "book-exchange-tennoji-20261031",
+      "kind": "event",
+      "name": "小さな読書交流会-わたしの1冊、あなたの1冊-",
+      "category": "読書・交流",
+      "topics": ["culture", "learning"],
+      "area": "大阪市天王寺区",
+      "venue": "天王寺図書館 2階 集会室",
+      "schedule": "2026年10月31日（土曜日）10:30〜12:00",
+      "start_date": "2026-10-31",
+      "end_date": "2026-10-31",
+      "occurrence_dates": [
+        "2026-10-31"
+      ],
+      "eligibility": "どなたでも",
+      "capacity": "8名・事前申込先着順",
+      "registration_period": "2026年9月1日10:00〜10月30日17:00（見学のみ申込不要）",
+      "summary": "「ジェンダー」「生き方」「多様性」をテーマにおすすめ本を1冊持ち寄って紹介し合う読書交流会。見学のみの参加は申込不要。",
+      "source_urls": [
+        "https://www.oml.city.osaka.lg.jp/key/2026/58_2026090102.html"
+      ],
+      "verified_at": "2026-09-10"
     }
   ]
 }

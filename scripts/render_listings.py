@@ -65,11 +65,20 @@ def ja_date(value: str) -> str:
 
 
 def listing_attributes(item: dict) -> str:
-    return (
-        'data-listing-card '
-        f'data-kind="{esc(item.get("kind", ""))}" '
-        f'data-category="{esc(item.get("category", ""))}"'
-    )
+    attrs = [
+        'data-listing-card',
+        f'data-kind="{esc(item.get("kind", ""))}"',
+        f'data-category="{esc(item.get("category", ""))}"',
+    ]
+    if item.get("kind") == "event":
+        if item.get("start_date"):
+            attrs.append(f'data-start-date="{esc(item["start_date"])}"')
+        if item.get("end_date"):
+            attrs.append(f'data-end-date="{esc(item["end_date"])}"')
+        occurrence_dates = item.get("occurrence_dates")
+        if occurrence_dates:
+            attrs.append(f'data-occurrence-dates="{esc(",".join(occurrence_dates))}"')
+    return " ".join(attrs)
 
 
 def source_buttons(item: dict, *, primary: bool) -> str:
@@ -153,7 +162,7 @@ def render_block(data: dict) -> str:
         number += 1
 
     parts = [
-        f'  <section class="section-tight listings-tools" data-listing-filters aria-labelledby="listing-filter-title"><div class="container"><div class="listing-filter-panel"><div class="listing-filter-copy"><p class="eyebrow">Find verified activities</p><h2 id="listing-filter-title">確認済み情報を絞り込む。</h2><p>名前、エリア、カテゴリー、会場などをキーワードで検索できます。</p></div><div class="listing-filter-controls"><label class="listing-search-label" for="listing-search">キーワード検索</label><input class="listing-search-input" id="listing-search" type="search" placeholder="例：梅田、語学、ボランティア" autocomplete="off" data-listing-search><div class="listing-kind-filter" role="group" aria-label="情報の種類"><button class="listing-filter-button is-active" type="button" data-listing-kind="all" aria-pressed="true">すべて</button><button class="listing-filter-button" type="button" data-listing-kind="resource" aria-pressed="false">継続情報</button><button class="listing-filter-button" type="button" data-listing-kind="event" aria-pressed="false">開催イベント</button></div><p class="listing-result-count" aria-live="polite" data-listing-count>{len(items)}件を表示中</p><p class="listing-empty" hidden data-listing-empty>条件に合う確認済み情報はありません。検索語や種類を変えてください。</p></div></div></div></section>',
+        f'  <section class="section-tight listings-tools" data-listing-filters aria-labelledby="listing-filter-title"><div class="container"><div class="listing-filter-panel"><div class="listing-filter-copy"><p class="eyebrow">Find verified activities</p><h2 id="listing-filter-title">確認済み情報を絞り込む。</h2><p>名前、エリア、カテゴリー、会場などをキーワードで検索できます。</p></div><div class="listing-filter-controls"><label class="listing-search-label" for="listing-search">キーワード検索</label><input class="listing-search-input" id="listing-search" type="search" placeholder="例：梅田、語学、ボランティア" autocomplete="off" data-listing-search><div class="listing-kind-filter" role="group" aria-label="情報の種類"><button class="listing-filter-button is-active" type="button" data-listing-kind="all" aria-pressed="true">すべて</button><button class="listing-filter-button" type="button" data-listing-kind="resource" aria-pressed="false">継続情報</button><button class="listing-filter-button" type="button" data-listing-kind="event" aria-pressed="false">開催イベント</button></div><div class="listing-kind-filter" role="group" aria-label="開催時期"><button class="listing-filter-button is-active" type="button" data-listing-period="all" aria-pressed="true">すべて</button><button class="listing-filter-button" type="button" data-listing-period="week" aria-pressed="false">今週</button><button class="listing-filter-button" type="button" data-listing-period="month" aria-pressed="false">今月</button></div><p class="listing-result-count" aria-live="polite" data-listing-count>{len(items)}件を表示中</p><p class="listing-empty" hidden data-listing-empty>条件に合う確認済み情報はありません。検索語や種類を変えてください。</p></div></div></div></section>',
         f'  <section class="section-tight"><div class="narrow"><div class="notice"><strong>最終確認日：{verified_at}</strong><br>参加者の男女比、年齢層、雰囲気、人気度など、公式に確認できない情報は掲載していません。イベント情報は変更・中止の可能性があるため、申込前に必ず公式ページを確認してください。</div></div></section>',
     ]
 
