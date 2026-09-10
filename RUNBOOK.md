@@ -14,8 +14,10 @@ production to verify), then duplicate/stale active work, then blocked
 Issues whose dependency resolved, then the next `ready` Issue by priority.
 `scripts/autopilot_status.py` implements this precedence deterministically
 from a GitHub-state snapshot; `.github/workflows/autopilot-watch.yml` runs
-hourly to surface duplicate/stale active work without ever calling an LLM
-or merging/deploying/deleting anything. Never start a second active
+on manual dispatch, hourly fallback, and `workflow_run` completion of PR
+checks, Browser QA, and Deploy 50PLUS GitHub Pages, to surface
+duplicate/stale active work without ever calling an LLM or
+merging/deploying/deleting anything. Never start a second active
 implementation task while an unfinished PR of your own exists.
 
 ## Publishing architecture
