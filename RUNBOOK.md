@@ -24,6 +24,10 @@ The production artifact contains:
 - `guides.html`
 - `about.html`
 - `contact.html`
+- `learning.html`
+- `volunteering.html`
+- `sports.html`
+- `culture-library.html`
 - `404.html`
 - `assets/`
 - `robots.txt`
@@ -144,6 +148,10 @@ Current coverage:
 - Guides
 - About
 - Contact
+- Learning
+- Volunteering
+- Sports
+- Culture/Library
 - 404
 
 Viewports:
@@ -175,14 +183,22 @@ Do not hand-edit the generated verified-listing cards in `listings.html`. The ge
 - `VERIFIED_LISTINGS_GENERATED_START`
 - `VERIFIED_LISTINGS_GENERATED_END`
 
+`scripts/render_listings.py` also owns the generated per-topic listing blocks in the four topic hub pages, filtered by each listing's `topics` field. Do not hand-edit these blocks either. Each is bounded by its own marker pair:
+- `learning.html`: `TOPIC_LEARNING_GENERATED_START` / `TOPIC_LEARNING_GENERATED_END`
+- `volunteering.html`: `TOPIC_VOLUNTEERING_GENERATED_START` / `TOPIC_VOLUNTEERING_GENERATED_END`
+- `sports.html`: `TOPIC_SPORTS_GENERATED_START` / `TOPIC_SPORTS_GENERATED_END`
+- `culture-library.html`: `TOPIC_CULTURE_GENERATED_START` / `TOPIC_CULTURE_GENERATED_END`
+
+`python3 scripts/render_listings.py --check` validates that all five generated surfaces (`listings.html` plus the four topic hub pages) are in sync with `data/verified-listings.json`; it is run in PR checks and in the Pages deploy workflow.
+
 ### Update sequence
 
 1. Re-check the official source before changing a listing.
-2. Update only verified facts in `data/verified-listings.json`.
+2. Update only verified facts in `data/verified-listings.json`, including the `topics` field used to route listings to topic hub pages.
 3. Update `verified_at` only when actually re-verified.
 4. For events, maintain `start_date` and `end_date` in `YYYY-MM-DD`.
 5. Run `python3 scripts/render_listings.py`.
-6. Review the generated `listings.html` diff.
+6. Review the generated diff in `listings.html` and in any affected topic hub pages.
 7. Run or wait for PR checks.
 8. Merge only after JSON validation, HTML sync, local-link and secret-pattern checks pass.
 

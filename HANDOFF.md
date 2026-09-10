@@ -25,14 +25,14 @@ Before doing new work:
 
 The repository-side production foundation is in place:
 
-- six primary public pages plus the project 404 page
+- six primary public pages, four topic hub pages (`learning.html`, `volunteering.html`, `sports.html`, `culture-library.html`), plus the project 404 page
 - responsive static HTML / CSS / vanilla JavaScript
 - adult friendship / community discovery positioning; not a dating, pickup or sexual-service product
 - verified listing facts use `data/verified-listings.json` as canonical data
 - `scripts/render_listings.py` deterministically keeps generated listing markup synchronized with canonical JSON
 - CI validates local links, common secret patterns, listing schema, JSON-to-HTML sync and stale verified event dates
 - repository-native Browser QA uses pinned Playwright / Chromium against checked-out files served locally on the GitHub Actions runner
-- Browser QA covers HOME, Activities, Listings, Guides, About, Contact and 404 at desktop and 390px mobile viewports
+- Browser QA covers HOME, Activities, Listings, Guides, the four topic hubs, About, Contact and 404 at desktop and 390px mobile viewports
 - mobile navigation prevents focus entering a closed menu and restores focus to the trigger when Escape closes an open menu
 - the visual system includes committed optimized lifestyle stills and two MP4 loops under `assets/media/`
 - the home hero has a static poster/fallback and honors `prefers-reduced-motion`
