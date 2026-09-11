@@ -1,6 +1,6 @@
 # 50PLUS — HANDOFF
 
-Updated: 2026-09-10 JST
+Updated: 2026-09-11 JST
 
 ## Purpose
 
@@ -75,49 +75,26 @@ Do not change unrelated `rss7.net` DNS records.
 
 ## Current cross-session state
 
-Active implementation task: **Issue #76 — Add verified upcoming Osaka events and current discovery flow**.
+The 50PLUS public site is in a stable production state on dedicated GitHub Pages.
 
-Current working branch: `feat/issue-76-upcoming-events` based on main commit `7dcd32900b97135c0b16e80ca074956cb6326a02`.
+Production status:
 
-Current unmerged work on this branch:
+- Production URL: `https://oosaka0123-sudo.github.io/50plus/`
+- `main` is the current source of truth and the working tree was clean at this handoff update.
+- The verified Osaka listing/event discovery work is merged and live; canonical JSON and generated listing HTML are synchronized.
+- Runtime event expiry and `all / this week / this month` discovery are live on Listings, with expiry protection also active on the four topic hubs.
+- Final live QA on 2026-09-11 confirmed all 11 public runtime pages return successfully, internal links are valid, public pages are indexable, and robots/sitemap point at the production origin.
+- Lighthouse on the production home page scored 98 Performance, 100 Accessibility, 100 Best Practices and 100 SEO. Observed lab metrics included LCP about 1.9s, CLS 0 and TBT about 30ms.
+- Repository deterministic listing sync and Autopilot self-tests are green.
 
-- `data/verified-listings.json` now has 13 total records: the previous 8 plus 5 official-source Osaka events verified on 2026-09-10.
-- The two existing multi-date events now have `occurrence_dates`; the five new events also have machine-readable occurrence dates.
-- A machine comparison confirmed the previous 8 records' factual fields were unchanged except for the intentional `occurrence_dates` additions to the two existing events.
-- `scripts/render_listings.py` emits event start/end/occurrence dates as data attributes and adds `すべて / 今週 / 今月` period controls on `listings.html`.
-- `assets/listings-filter.js` computes current week/month at runtime, uses `occurrence_dates` when present, and hides expired event cards on Listings plus all four topic hubs while leaving resource cards visible.
-- The generated HTML files have been regenerated and `python scripts/render_listings.py --check` passes for `listings.html` and all four topic hubs.
-- Browser QA now covers `すべて / 今週 / 今月`, kind-filter interaction, no-match/reset behavior, and runtime expiry on Listings plus all four topic hubs using a fixed far-future clock; the local run passed for 11 pages across desktop and 390px mobile.
-- Issue #76 is not merged to main yet; local implementation and QA are ready for commit/push and PR.
+Separate operational blocker:
 
-Five new event records currently staged in the canonical JSON are:
+- The GitHub `Claude Code Issue Task` automation is tracked separately and does not block the live site.
+- Repository authentication presence checks pass, but a sanitized direct Anthropic API probe confirmed the existing API credential cannot perform inference because the Anthropic API credit balance is too low.
+- Do not modify, rotate, expose or replace credentials autonomously. The next action for that automation is a human Anthropic billing/credit action; after credits are available, re-run the safe ANALYSIS-ONLY trigger and close the repair Issue only after a successful Claude Action run.
 
-- 2026-09-26 認知症サポーター養成講座
-- 2026-10-03 読書前のヨガ・タイム
-- 2026-10-09 読書会『憑神』
-- 2026-10-11 オータム・チャレンジ・スポーツ ニュースポーツ体験会
-- 2026-10-31 小さな読書交流会-わたしの1冊、あなたの1冊-
+There is no remaining code/content task required to consider the current GitHub Pages site production-ready. Future work such as a custom domain, a real public contact intake channel, nationwide expansion or new verified listings should start as new scoped Issues rather than being treated as unfinished release work.
 
-Council / automation state:
-
-- Council Autopilot core is merged and live.
-- Event-driven `Autopilot Watch` is merged and verified in production; Pages completion successfully triggered the watcher and produced `no_action_clean` when the queue was empty.
-- Issue #76 was then created and moved to `status:active`, `priority:high`, `risk:low` so development could continue.
-- GitHub `@claude` automation currently authenticates successfully (`ANTHROPIC_API_KEY` present) but the Claude Code Action fails immediately after model initialization with `result is_error:true`. Do not treat this as a missing-secret problem.
-- Until that GitHub Action failure is repaired, use the connected Surface Claude Code as the implementation owner for Issue #76, with Gemini as independent reviewer and ChatGPT as PM/integrator.
-- Surface Claude has repeatedly consumed max-turns during broad tasks; keep follow-up work narrowly split by file/phase instead of reissuing the whole Issue.
-
-### Exact next steps
-
-1. Commit/push the completed Issue #76 branch and open its PR.
-2. Wait for required PR checks and Browser QA; fix any branch-owned failure within the retry policy.
-3. Merge only after required checks are green and review has no blocker.
-4. Verify the GitHub Pages deployment and live production behavior before closing Issue #76.
-5. Track the GitHub Claude Action `is_error:true` failure as a separate repair task; do not mix it into Issue #76 unless it becomes necessary to finish #76 safely.
-
-### Re-entry message
-
-`Resume 50PLUS Issue #76 from branch feat/issue-76-upcoming-events. Implementation, deterministic HTML regeneration, local/static checks, Browser QA, expiry coverage, and final Gemini review are complete. Continue with commit/push -> PR -> CI -> merge -> Pages -> live verify. GitHub @claude auth passes but the Action currently dies with result is_error:true; keep that as a separate repair task.`
 ## Current development rule
 
 After reconciliation:
