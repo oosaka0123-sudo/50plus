@@ -302,3 +302,79 @@ jobs:
             exit 1
           fi
           echo 'No common secret patterns found.'
+
+  claude-auth-diagnostic:
+    if: ${{ github.head_ref == 'fix/issue-16-claude-action' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe Anthropic API without exposing credentials
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, sys, urllib.error, urllib.request
+
+          key = os.environ.get('ANTHROPIC_API_KEY', '')
+          if not key:
+              print('anthropic_key_present=false')
+              raise SystemExit(1)
+          print('anthropic_key_present=true')
+
+          headers = {'x-api-key': key, 'anthropic-version': '2023-06-01'}
+
+          def call(url, data=None):
+              req = urllib.request.Request(url, data=data, headers=headers, method='POST' if data else 'GET')
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as res:
+                      return res.status, res.read()
+              except urllib.error.HTTPError as exc:
+                  return exc.code, exc.read()
+
+          def error_meta(body):
+              try:
+                  payload = json.loads(body.decode('utf-8', errors='replace'))
+              except Exception:
+                  return 'unparseable', 'non-json error response'
+              err = payload.get('error') or {}
+              etype = str(err.get('type') or payload.get('type') or 'unknown')
+              msg = str(err.get('message') or '')
+              msg = re.sub(r'sk-ant-[A-Za-z0-9_-]+', '[REDACTED]', msg)[:180]
+              return etype, msg
+
+          status, body = call('https://api.anthropic.com/v1/models')
+          print(f'anthropic_models_http_status={status}')
+          if status != 200:
+              etype, msg = error_meta(body)
+              print(f'anthropic_models_error_type={etype}')
+              print(f'anthropic_models_error_message={msg}')
+              raise SystemExit(1)
+
+          payload = json.loads(body)
+          ids = [str(item.get('id','')) for item in payload.get('data', []) if item.get('id')]
+          print(f'anthropic_model_count={len(ids)}')
+          print(f'anthropic_has_opus5={any("claude-opus-5" in mid for mid in ids)}')
+          print(f'anthropic_has_sonnet5={any("claude-sonnet-5" in mid for mid in ids)}')
+          preferred = next((mid for mid in ids if 'claude-opus-5' in mid), None)
+          preferred = preferred or next((mid for mid in ids if 'claude-sonnet-5' in mid), None)
+          preferred = preferred or (ids[0] if ids else None)
+          if not preferred:
+              print('anthropic_probe_error=no_models_returned')
+              raise SystemExit(1)
+          print(f'anthropic_probe_model={preferred}')
+
+          request_body = json.dumps({
+              'model': preferred,
+              'max_tokens': 1,
+              'messages': [{'role': 'user', 'content': 'Reply OK.'}],
+          }).encode('utf-8')
+          headers['content-type'] = 'application/json'
+          status, body = call('https://api.anthropic.com/v1/messages', request_body)
+          print(f'anthropic_messages_http_status={status}')
+          if status != 200:
+              etype, msg = error_meta(body)
+              print(f'anthropic_messages_error_type={etype}')
+              print(f'anthropic_messages_error_message={msg}')
+              raise SystemExit(1)
+          print('anthropic_minimal_inference=success')
+          PY
