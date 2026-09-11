@@ -91,7 +91,7 @@ Separate operational blocker:
 
 - The GitHub `Claude Code Issue Task` automation is tracked separately and does not block the live site.
 - Repository authentication presence checks pass, but a sanitized direct Anthropic API probe confirmed the existing API credential cannot perform inference because the Anthropic API credit balance is too low.
-- Do not modify, rotate, expose or replace credentials autonomously. The next action for that automation is a human Anthropic billing/credit action; after credits are available, re-run the safe ANALYSIS-ONLY trigger and close the repair Issue only after a successful Claude Action run.
+- Do not modify, rotate, expose or replace credentials autonomously. The Anthropic Billing page (`https://platform.claude.com/settings/billing`) was reached in Opera and the user completed login, but no purchase was performed by an agent. The latest safe ANALYSIS-ONLY rerun still failed with authentication present, `is_error:true`, zero usage and empty model usage, consistent with the confirmed low-credit API response. The next action is still a human Anthropic billing/credit purchase; after credits are available, re-run the safe ANALYSIS-ONLY trigger and close Issue #16 only after a successful Claude Action run.
 
 There is no remaining code/content task required to consider the current GitHub Pages site production-ready. Future work such as a custom domain, a real public contact intake channel, nationwide expansion or new verified listings should start as new scoped Issues rather than being treated as unfinished release work.
 
