@@ -17,6 +17,8 @@ const pages = [
   ['culture-library', 'culture-library.html'],
   ['about', 'about.html'],
   ['contact', 'contact.html'],
+  ['site-info', 'site-info.html'],
+  ['privacy-policy', 'privacy-policy.html'],
   ['404', '404.html'],
 ];
 

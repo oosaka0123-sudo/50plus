@@ -31,6 +31,8 @@ jobs:
               Path('guides.html'),
               Path('about.html'),
               Path('contact.html'),
+              Path('site-info.html'),
+              Path('privacy-policy.html'),
               Path('learning.html'),
               Path('volunteering.html'),
               Path('sports.html'),

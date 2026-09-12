@@ -59,7 +59,7 @@ Primary production hosting is dedicated GitHub Pages for `oosaka0123-sudo/50plus
 
 - this repository remains the sole code/content SSOT
 - approved changes reach production from `main` through `.github/workflows/deploy-pages.yml`
-- the production Pages artifact must include the 11 public HTML pages (six primary pages, four topic hub pages and `404.html`), `assets/`, `robots.txt` and `sitemap.xml`
+- the production Pages artifact must include the 13 public HTML pages (six primary pages, two site-policy pages, four topic hub pages and `404.html`), `assets/`, `robots.txt` and `sitemap.xml`
 - production HTML must not contain preview-only `noindex,nofollow`
 - canonical, Open Graph, robots and sitemap URLs use the live GitHub Pages production URL
 - `https://50plus.rss7.net` is an optional future custom domain and is not a blocker for current production

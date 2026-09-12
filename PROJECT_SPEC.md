@@ -78,6 +78,11 @@ Secondary:
 - Future contact / listing request policy
 - No fake contact destination before a real channel is configured
 
+### Site information / privacy — `site-info.html`, `privacy-policy.html`
+- Site purpose, scope, editorial policy, disclaimer and contact route
+- Current privacy practices only; no invented data collection claims
+- Footer-accessible utility pages with canonical / OG metadata
+
 ### Topic hubs — `learning.html`, `volunteering.html`, `sports.html`, `culture-library.html`
 - Four static topic hub pages that deepen the site's existing verified data instead of adding raw listings or a blog
 - Each hub carries unique SEO metadata, an evergreen guidance section (process-focused: how to choose, what to check, how to prepare), and a topic-filtered verified-items block generated from `data/verified-listings.json`
@@ -167,7 +172,7 @@ Current implementation:
 - path-filtered rendered Browser QA uses pinned Playwright/Chromium against a local GitHub Actions runner server for UI-affecting changes
 - Browser QA stores reviewable desktop/mobile screenshot artifacts
 - production publishing uses repository-local `.github/workflows/deploy-pages.yml`
-- the production artifact contains 11 runtime HTML pages (six primary pages, four topic hub pages and `404.html`), `assets/`, `robots.txt`, `sitemap.xml` and `.nojekyll`
+- the production artifact contains 13 runtime HTML pages (six primary pages, two site-policy pages, four topic hub pages and `404.html`), `assets/`, `robots.txt`, `sitemap.xml` and `.nojekyll`
 - the production workflow verifies generated listings, rejects preview-only `noindex,nofollow`, and checks the expected GitHub Pages production origin
 - the existing `ai-agent` Pages bridge remains preview-only and continues to inject `noindex,nofollow`
 - this repository remains the sole 50PLUS source of truth
@@ -207,7 +212,7 @@ Detailed operational procedures belong in `RUNBOOK.md`.
 ## 11. Current Completion Definition
 
 The repository-side production foundation is complete when:
-- the six primary public pages and the four topic hub pages exist and share navigation / design
+- the six primary public pages, two site-policy pages and four topic hub pages exist and share navigation / design
 - mobile navigation works
 - UI-affecting changes can pass repository-native rendered desktop/mobile Browser QA with reviewable screenshot evidence
 - verified listings are sourced from canonical JSON and generated HTML stays in sync

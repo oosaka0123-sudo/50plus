@@ -61,7 +61,7 @@ jobs:
           set -euo pipefail
           rm -rf _site
           mkdir -p _site
-          cp index.html activities.html listings.html guides.html about.html contact.html learning.html volunteering.html sports.html culture-library.html 404.html _site/
+          cp index.html activities.html listings.html guides.html about.html contact.html site-info.html privacy-policy.html learning.html volunteering.html sports.html culture-library.html 404.html _site/
           cp robots.txt sitemap.xml _site/
           cp -R assets _site/assets
           touch _site/.nojekyll
