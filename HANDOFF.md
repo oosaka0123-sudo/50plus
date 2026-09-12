@@ -1,4 +1,4 @@
-﻿# 50PLUS — HANDOFF
+# 50PLUS — HANDOFF
 
 Updated: 2026-09-13 JST
 
@@ -118,4 +118,3 @@ Do not copy into this file:
 - duplicated repeatable procedures already owned by `RUNBOOK.md`
 
 Keep this file focused on unresolved cross-session constraints and resume decisions.
-
