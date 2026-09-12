@@ -1,6 +1,6 @@
 # 50PLUS — HANDOFF
 
-Updated: 2026-09-11 JST
+Updated: 2026-09-13 JST
 
 ## Purpose
 
@@ -26,14 +26,14 @@ Before doing new work:
 
 The repository-side production foundation is in place:
 
-- six primary public pages, four topic hub pages (`learning.html`, `volunteering.html`, `sports.html`, `culture-library.html`), plus the project 404 page
+- six primary public pages, two site-policy pages (`site-info.html`, `privacy-policy.html`), four topic hub pages (`learning.html`, `volunteering.html`, `sports.html`, `culture-library.html`), plus the project 404 page
 - responsive static HTML / CSS / vanilla JavaScript
 - adult friendship / community discovery positioning; not a dating, pickup or sexual-service product
 - verified listing facts use `data/verified-listings.json` as canonical data
 - `scripts/render_listings.py` deterministically keeps generated listing markup synchronized with canonical JSON
 - CI validates local links, common secret patterns, listing schema, JSON-to-HTML sync and stale verified event dates
 - repository-native Browser QA uses pinned Playwright / Chromium against checked-out files served locally on the GitHub Actions runner
-- Browser QA covers HOME, Activities, Listings, Guides, the four topic hubs, About, Contact and 404 at desktop and 390px mobile viewports
+- Browser QA covers HOME, Activities, Listings, Guides, the four topic hubs, About, Contact, Site information, Privacy policy and 404 at desktop and 390px mobile viewports
 - mobile navigation prevents focus entering a closed menu and restores focus to the trigger when Escape closes an open menu
 - the visual system includes committed optimized lifestyle stills and two MP4 loops under `assets/media/`
 - the home hero has a static poster/fallback and honors `prefers-reduced-motion`
@@ -83,7 +83,7 @@ Production status:
 - `main` is the current source of truth and the working tree was clean at this handoff update.
 - The verified Osaka listing/event discovery work is merged and live; canonical JSON and generated listing HTML are synchronized.
 - Runtime event expiry and `all / this week / this month` discovery are live on Listings, with expiry protection also active on the four topic hubs.
-- Final live QA on 2026-09-11 confirmed all 11 public runtime pages return successfully, internal links are valid, public pages are indexable, and robots/sitemap point at the production origin.
+- Final live QA on 2026-09-13 confirmed all 13 public runtime HTML pages are deployed and reachable, the two site-policy pages are linked throughout the site, public pages are indexable, a real missing URL returns HTTP 404, and robots/sitemap point at the production origin.
 - Lighthouse on the production home page scored 98 Performance, 100 Accessibility, 100 Best Practices and 100 SEO. Observed lab metrics included LCP about 1.9s, CLS 0 and TBT about 30ms.
 - Repository deterministic listing sync and Autopilot self-tests are green.
 
