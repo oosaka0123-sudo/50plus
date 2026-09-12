@@ -40,6 +40,8 @@ The production artifact contains:
 - `guides.html`
 - `about.html`
 - `contact.html`
+- `site-info.html`
+- `privacy-policy.html`
 - `learning.html`
 - `volunteering.html`
 - `sports.html`
@@ -164,6 +166,8 @@ Current coverage:
 - Guides
 - About
 - Contact
+- Site information
+- Privacy policy
 - Learning
 - Volunteering
 - Sports
