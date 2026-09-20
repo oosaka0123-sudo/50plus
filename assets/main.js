@@ -58,6 +58,14 @@
   const year = document.querySelector('[data-current-year]');
   if (year) year.textContent = String(new Date().getFullYear());
 
+  const formSuccess = document.querySelector('[data-form-success]');
+  const params = new URLSearchParams(window.location.search);
+  if (formSuccess && params.get('sent') === '1') {
+    formSuccess.hidden = false;
+    formSuccess.focus({ preventScroll: true });
+    window.history.replaceState({}, '', `${window.location.pathname}#contact-form`);
+  }
+
   const heroMedia = document.querySelector('[data-hero-media]');
   if (heroMedia) {
     const video = heroMedia.querySelector('[data-hero-video]');
