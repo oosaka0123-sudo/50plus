@@ -366,6 +366,63 @@ main { overflow: hidden; }
 }
 .notice strong { color: #3d3213; }
 
+.contact-panel { box-shadow: var(--shadow); }
+.contact-panel h2 { margin-bottom: 8px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
+.form-intro { margin: 0 0 28px; color: var(--muted); }
+.contact-form { display: grid; gap: 22px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-field { display: grid; gap: 8px; }
+.form-field label { font-weight: 800; }
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #b9c1cc;
+  border-radius: 12px;
+  outline: 0;
+}
+.form-field textarea { min-height: 180px; resize: vertical; }
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(201, 240, 70, .55);
+}
+.required-mark,
+.optional-mark {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: .72rem;
+  line-height: 1.4;
+  vertical-align: .12em;
+}
+.required-mark { color: #fff; background: var(--navy); }
+.optional-mark { color: var(--muted); background: #edf0f4; }
+.field-help,
+.form-note { margin: 0; color: var(--muted); font-size: .86rem; }
+.consent-field { display: flex; align-items: flex-start; gap: 11px; cursor: pointer; }
+.consent-field input { width: 20px; height: 20px; margin-top: .2em; flex: 0 0 auto; accent-color: var(--navy); }
+.consent-field a { text-decoration: underline; text-underline-offset: 3px; }
+.submit-button { width: 100%; border: 0; cursor: pointer; }
+.form-success {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 22px;
+  padding: 20px 22px;
+  border: 1px solid #9cc737;
+  border-radius: 18px;
+  background: #f2ffd0;
+  color: #24320f;
+}
+.form-success[hidden] { display: none; }
+.honeypot { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; }
+
 .page-hero { padding: 78px 0 56px; }
 .page-hero h1 { max-width: 900px; font-size: clamp(2.8rem, 7vw, 5.8rem); }
 .page-hero .lead { max-width: 800px; }
@@ -539,6 +596,7 @@ main { overflow: hidden; }
   .category { min-height: 150px; }
   .gallery-grid { grid-template-columns: 1fr; }
   .panel, .card { padding: 24px; }
+  .form-row { grid-template-columns: 1fr; }
   .guide-card { grid-template-columns: 1fr; }
   .cta-band { padding: 30px 24px; flex-direction: column; align-items: flex-start; }
   .footer-grid { grid-template-columns: 1fr; }
