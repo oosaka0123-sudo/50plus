@@ -286,8 +286,7 @@ const checkEventExpiryUnderFutureClock = async (browser, pageName, path) => {
       const totalEvents = await eventCards.count();
       const totalResources = await resourceCards.count();
 
-      record(totalEvents > 0, `${prefix}: expected at least one event card to test expiry against`);
-      if (totalEvents > 0) {
+      // Pages can legitimately have no current events after verified listings\n      // expire. In that case there is nothing to exercise with the future\n      // clock, so only assert expiry behavior when event fixtures exist.\n      if (totalEvents > 0) {
         const visibleEvents = await page.locator('[data-listing-card][data-kind="event"]:visible').count();
         record(visibleEvents === 0, `${prefix}: event cards are still visible under a far-future clock`);
       }
