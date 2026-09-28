@@ -148,28 +148,6 @@
       "verified_at": "2026-09-09"
     },
     {
-      "id": "dementia-supporter-yodogawa-20260926",
-      "kind": "event",
-      "name": "認知症サポーター養成講座",
-      "category": "学び・ボランティア",
-      "topics": ["learning", "volunteering"],
-      "area": "大阪市淀川区",
-      "venue": "淀川図書館 多目的室",
-      "schedule": "2026年9月26日（土曜日）14:00〜15:30",
-      "start_date": "2026-09-26",
-      "end_date": "2026-09-26",
-      "occurrence_dates": [
-        "2026-09-26"
-      ],
-      "capacity": "25名・事前申込先着順",
-      "registration_period": "2026年9月6日〜9月25日",
-      "summary": "認知症を正しく理解し、認知症の方や家族を見守る応援者について学ぶ講座。ボランティア活動に関心がある方にも案内されている。",
-      "source_urls": [
-        "https://www.oml.city.osaka.lg.jp/key/2026/61_2026090901.html"
-      ],
-      "verified_at": "2026-09-10"
-    },
-    {
       "id": "reading-yoga-joto-20261003",
       "kind": "event",
       "name": "読書前のヨガ・タイム",
