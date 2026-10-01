@@ -82,4 +82,4 @@ jobs:
             - Do not auto-merge; leave the implementation in a PR-reviewable state.
 
             Complete as much of the Issue as its selected task mode safely allows.
-          claude_args: '--max-turns 20 --allowed-tools "Bash"'
+          claude_args: '--model sonnet --max-turns 20 --allowed-tools "Bash"'
